@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Правописание безударных гласных в корне слова</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+        }
+        
+        .video-container {
+            position: fixed;
+            top: 0;
+            width: 25vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        #left-video {
+            left: 0;
+        }
+        
+        #right-video {
+            right: 0;
+        }
+        
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .content-background {
+            position: fixed;
+            top: 0;
+            left: 25vw;
+            right: 25vw;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2;
+            backdrop-filter: blur(5px);
+        }
+        
+        .content {
+            position: fixed;
+            top: 0;
+            left: 25vw;
+            right: 25vw;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .header {
+            width: 100%;
+            max-width: 800px;
+            background: linear-gradient(135deg, #f5e7d0, #e1c9a8);
+            padding: 18px 25px;
+            border-radius: 60px;
+            box-shadow: 
+                0 8px 16px rgba(0,0,0,0.1),
+                inset 0 -4px 8px rgba(0,0,0,0.1),
+                inset 0 4px 8px rgba(255,255,255,0.4);
+            text-align: center;
+            font-family: 'Lobster', cursive;
+            font-size: 28px;
+            margin-bottom: 30px;
+            border: 1px solid #d4b483;
+        }
+        
+        .header-text {
+            background: linear-gradient(90deg, #ff8a00, #e52e71, #1e90ff, #ff8a00);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient 8s linear infinite;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            padding: 5px 0;
+        }
+        
+        .team-label {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 120px;
+            background: linear-gradient(135deg, #f5e7d0, #e1c9a8);
+            padding: 8px 20px;
+            border-radius: 30px;
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.1),
+                inset 0 -2px 4px rgba(0,0,0,0.1),
+                inset 0 2px 4px rgba(255,255,255,0.4);
+            font-family: 'Lobster', cursive;
+            font-size: 18px;
+            z-index: 6;
+            border: 1px solid #d4b483;
+            color: #5a4a3a;
+            white-space: nowrap;
+            display: block;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        .text-container {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(30, 136, 229, 0.5);
+            position: relative;
+            height: 60vh;
+            width: 100%;
+            max-width: 780px;
+            border: 1px solid rgba(100, 180, 255, 0.3);
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .text-content {
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            font-size: 18px;
+            line-height: 1.6;
+            color: white;
+            text-align: justify;
+            padding-right: 10px;
+        }
+        
+        .word {
+            white-space: nowrap;
+        }
+        
+        .gap-container {
+            display: inline-block;
+            position: relative;
+            width: 24px;
+            height: 24px;
+            margin: 0 1px;
+            vertical-align: middle;
+        }
+        
+        .gap {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            outline: none;
+            padding: 0;
+            box-sizing: border-box;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        
+        .gap:focus {
+            border-color: #2196F3;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .gap.correct {
+            border-color: #4CAF50;
+            color: #2E7D32;
+            background-color: rgba(76, 175, 80, 0.2);
+        }
+        
+        .gap.incorrect {
+            border-color: #F44336;
+            color: #c62828;
+            background-color: rgba(244, 67, 54, 0.2);
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+        }
+        
+        .crab-video {
+            width: 120px;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, #2196F3, #1565C0);
+            color: white;
+            width: 150px;
+            height: 50px;
+            border-radius: 25px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.3),
+                inset 0 -5px 10px rgba(0,0,0,0.2),
+                inset 0 5px 10px rgba(255,255,255,0.4);
+            transition: 
+                transform 0.3s,
+                box-shadow 0.3s;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #clearBtn {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+        
+        #checkBtn {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+        }
+        
+        #enableBtn {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+        }
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.3) 50%,
+                rgba(255,255,255,0) 100%
+            );
+            transform: skewX(-25deg);
+            transition: left 0.7s;
+            z-index: 1;
+        }
+        
+        .action-button:hover::before {
+            left: 100%;
+        }
+        
+        .action-button:hover {
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 
+                0 8px 20px rgba(0,0,0,0.4),
+                inset 0 -5px 10px rgba(0,0,0,0.2),
+                inset 0 5px 10px rgba(255,255,255,0.4);
+        }
+        
+        .action-button:active {
+            transform: scale(0.98) translateY(1px);
+            box-shadow: 
+                0 2px 5px rgba(0,0,0,0.2),
+                inset 0 -3px 5px rgba(0,0,0,0.2),
+                inset 0 3px 5px rgba(255,255,255,0.4);
+        }
+        
+        .result-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid rgba(100, 180, 255, 0.3);
+            display: none;
+        }
+        
+        .author-signature {
+            text-align: right;
+            margin-top: 15px;
+            font-style: italic;
+            color: #fff;
+            font-size: 18px;
+            padding-right: 20px;
+            display: none;
+        }
+        
+        #left-video-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 12;
+        }
+        
+        #side-sound-btn {
+            background: linear-gradient(135deg, #2196F3, #1565C0);
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.3),
+                inset 0 -5px 10px rgba(0,0,0,0.2),
+                inset 0 5px 10px rgba(255,255,255,0.4);
+            transition: all 0.3s;
+        }
+        
+        #side-sound-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 8px 20px rgba(0,0,0,0.4),
+                inset 0 -5px 10px rgba(0,0,0,0.2),
+                inset 0 5px 10px rgba(255,255,255,0.4);
+        }
+
+        .next-container {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 30;
+        }
+
+        .rakovina-img {
+            width: 120px;
+            height: auto;
+            min-width: 120px;
+        }
+
+        .next-button {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            width: 80px;
+            height: 40px;
+            min-width: 80px;
+            background: linear-gradient(135deg, #b388ff, #7c4dff);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 
+                0 3px 10px rgba(0,0,0,0.3),
+                inset 0 -3px 6px rgba(0,0,0,0.2),
+                inset 0 3px 6px rgba(255,255,255,0.4);
+            transition: all 0.3s;
+            overflow: hidden;
+            display: none;
+        }
+
+        .next-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.3) 50%,
+                rgba(255,255,255,0) 100%
+            );
+            transform: skewX(-25deg);
+            transition: left 0.7s;
+            z-index: 1;
+        }
+
+        .next-button:hover::before {
+            left: 100%;
+        }
+
+        .next-button:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.4),
+                inset 0 -3px 6px rgba(0,0,0,0.2),
+                inset 0 3px 6px rgba(255,255,255,0.4);
+        }
+
+        .next-button:active {
+            transform: translate(-50%, -50%) scale(0.98);
+            box-shadow: 
+                0 1px 3px rgba(0,0,0,0.2),
+                inset 0 -2px 4px rgba(0,0,0,0.2),
+                inset 0 2px 4px rgba(255,255,255,0.4);
+        }
+        
+        /* Стили для выпадающего списка */
+        .gap-select {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #4CAF50;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            outline: none;
+            padding: 0;
+            box-sizing: border-box;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .gap-select:focus {
+            border-color: #2196F3;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.5);
+            transform: scale(1.05);
+        }
+
+        .gap-select.correct {
+            border-color: #4CAF50;
+            color: #2E7D32;
+            background-color: rgba(76, 175, 80, 0.2);
+        }
+
+        .gap-select.incorrect {
+            border-color: #F44336;
+            color: #c62828;
+            background-color: rgba(244, 67, 54, 0.2);
+        }
+        
+        /* ========== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ========== */
+        @media (max-width: 1024px) {
+            .video-container {
+                width: 20vw;
+            }
+            
+            .content-background {
+                left: 20vw;
+                right: 20vw;
+            }
+            
+            .content {
+                left: 20vw;
+                right: 20vw;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .video-container {
+                width: 15vw;
+            }
+            
+            .content-background {
+                left: 15vw;
+                right: 15vw;
+            }
+            
+            .content {
+                left: 15vw;
+                right: 15vw;
+            }
+            
+            .header {
+                font-size: 20px;
+                padding: 12px 20px;
+                margin-bottom: 20px;
+            }
+            
+            .text-container {
+                height: 50vh;
+                padding: 15px;
+            }
+            
+            .text-content {
+                font-size: 16px;
+            }
+            
+            .action-button {
+                width: 130px;
+                height: 45px;
+                font-size: 16px;
+            }
+            
+            .crab-video {
+                width: 90px;
+            }
+
+            .rakovina-img {
+                width: 100px;
+            }
+
+            .next-button {
+                width: 70px;
+                height: 35px;
+                font-size: 14px;
+            }
+
+            .team-label {
+                font-size: 16px;
+                padding: 6px 15px;
+                bottom: 100px;
+            }
+
+            .gap-container {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .gap-select {
+                font-size: 16px;
+            }
+            
+            #side-sound-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-container {
+                width: 0;
+                display: none;
+            }
+            
+            .content-background {
+                left: 0;
+                right: 0;
+                background-color: rgba(0, 0, 0, 0.85);
+            }
+            
+            .content {
+                left: 0;
+                right: 0;
+                padding: 15px;
+            }
+            
+            .header {
+                font-size: 18px;
+                padding: 10px 15px;
+                width: 95%;
+            }
+            
+            .text-container {
+                height: 55vh;
+                width: 95%;
+                padding: 10px;
+            }
+            
+            .text-content {
+                font-size: 15px;
+            }
+            
+            .buttons-container {
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 20px;
+            }
+            
+            .action-button {
+                width: 120px;
+                height: 40px;
+                font-size: 15px;
+            }
+            
+            .crab-video {
+                width: 70px;
+                order: -1;
+                margin-bottom: 10px;
+            }
+
+            .rakovina-img {
+                width: 90px;
+            }
+
+            .next-button {
+                width: 65px;
+                height: 30px;
+                font-size: 13px;
+            }
+
+            .team-label {
+                font-size: 14px;
+                padding: 5px 12px;
+                bottom: 90px;
+                width: max-content;
+            }
+
+            .gap-container {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .gap-select {
+                font-size: 14px;
+            }
+            
+            .result-container {
+                font-size: 16px;
+                padding: 10px;
+            }
+            
+            #left-video-controls {
+                left: 10px;
+                bottom: 10px;
+            }
+            
+            #side-sound-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header {
+                font-size: 16px;
+            }
+            
+            .text-content {
+                font-size: 14px;
+            }
+            
+            .action-button {
+                width: 110px;
+                font-size: 14px;
+            }
+            
+            .gap-container {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .gap-select {
+                font-size: 13px;
+            }
+        }
+
+        /* ========== ВЕРТИКАЛЬНАЯ ОРИЕНТАЦИЯ ========== */
+        @media (max-width: 768px) and (orientation: portrait) {
+            .text-container {
+                height: 45vh;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .action-button {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .crab-video {
+                width: 80px;
+                margin-bottom: 5px;
+            }
+
+            .team-label {
+                position: relative;
+                bottom: auto;
+                margin: 10px 0;
+                width: 100%;
+                text-align: center;
+            }
+
+            .next-container {
+                right: 10px;
+                bottom: 10px;
+            }
+
+            .rakovina-img {
+                width: 80px;
+            }
+
+            .next-button {
+                width: 60px;
+                height: 30px;
+                font-size: 12px;
+            }
+
+            #side-sound-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) and (orientation: portrait) {
+            .header {
+                font-size: 16px;
+                padding: 8px 12px;
+            }
+
+            .text-container {
+                height: 50vh;
+                padding: 8px;
+            }
+
+            .text-content {
+                font-size: 14px;
+                line-height: 1.4;
+            }
+
+            .action-button {
+                height: 35px;
+                font-size: 14px;
+            }
+
+            .gap-container {
+                width: 16px;
+                height: 16px;
+            }
+
+            .gap-select {
+                font-size: 13px;
+            }
+
+            .result-container {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 360px) and (orientation: portrait) {
+            .header {
+                font-size: 14px;
+            }
+
+            .text-content {
+                font-size: 13px;
+            }
+
+            .action-button {
+                font-size: 13px;
+                height: 30px;
+            }
+
+            .gap-container {
+                width: 14px;
+                height: 14px;
+            }
+
+            .gap-select {
+                font-size: 12px;
+            }
+
+            .rakovina-img {
+                width: 70px;
+            }
+
+            .next-button {
+                width: 50px;
+                height: 25px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Видео по бокам -->
+    <div class="video-container" id="left-video">
+        <video id="left-video-element" autoplay loop playsinline muted>
+            <source src="../video/Mtluza.mp4" type="video/mp4">
+        </video>
+        <div id="left-video-controls">
+            <button id="side-sound-btn">🔇 Включить звук</button>
+        </div>
+    </div>
+    
+    <div class="video-container" id="right-video">
+        <video autoplay loop muted playsinline>
+            <source src="../video/konek.mp4" type="video/mp4">
+        </video>
+    </div>
+    
+    <!-- Полупрозрачная плашка -->
+    <div class="content-background"></div>
+    
+    <!-- Контент с заданием -->
+    <div class="content">
+        <div class="header">
+            <div class="header-text">Правописание безударных гласных в корне слова</div>
+        </div>
+        
+        <div class="text-container">
+            <div class="text-content" id="textContainer"></div>
+            <div class="author-signature" id="authorSignature">(По В.П. Катаеву)</div>
+        </div>
+        
+        <div class="buttons-container" id="buttonsContainer">
+            <video class="crab-video" src="../video/krab.mp4" autoplay loop muted></video>
+            <div class="team-label">Задание для Котика</div>
+            <button class="action-button" id="enableBtn">Включить</button>
+            <button class="action-button" id="checkBtn" style="display: none;">Проверить</button>
+            <button class="action-button" id="gradeBtn" style="display: none;">Оценка</button>
+            <button class="action-button" id="clearBtn" style="display: none;">Очистить</button>
+        </div>
+        
+        <div class="result-container" id="gradeResult"></div>
+        <div class="result-container" id="statsResult"></div>
+    </div>
+
+    <script>
+        // ===== ЗАЩИТА ОТ ПРОСМОТРА КОДА ===== //
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J'].includes(e.key)) || (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                alert('Доступ к коду ограничен!');
+            }
+        });
+
+        // ===== ЗАШИФРОВАННЫЕ ДАННЫЕ ===== //
+        const encryptedData = {
+            text: "ОчXXрование моря заключается в какой-то тайне, которую оно всегда хрXXнит в своих пространствах... Медуза вXXсела прозрачным абXXжуром с кистью таких же прозрачных щупалец. Осторожно – чтобы не прикXXснуться к ядовитой кайме, обжXXгающей, как крапива, – Петя обеими руками схвXXтил медузу за купол и вытащил увесистое, но непрочное её тело из воды. Солнце блXXстало, зажXXгаясь в её слизи золотой звёздочкой... Потом Петя стал нырять с открытыми глазами. Какое это упXXение! На глубине возникал удXXвительный мир подводного царства. Стебли подводных рXXстений составляли сказочный лес. Среди корней проворно пробXXрался боком большой старый краб. Он нёс на своих паучьих ногах дугую коробочку спины, покрытую известковыми бородавками мXXллюсков. Но гораздо интереснее казались морские коньки. Как раз небольшая их стайка поXXвилась среди водорXXслей. С точеными мордочками и грудками они плыли стоймя, прямо на Петю, распустив перепончатые плXXвники крошечных подводных драконов. Как видно, они совсем не предполXXгали, что могут в такой ранний час наткнуться на охотника.",
+            answers: [1, 1, 10, 1, 16, 10, 1, 10, 10, 16, 10, 1, 10, 16, 33, 16, 1, 1],
+            // Для каждого пропуска указываем возможные варианты букв, которые можно перепутать
+            possibleLetters: [
+                ['я', 'а', 'и', 'е'],    // ОчАрование
+                ['а', 'о'],              // хрАнит
+                ['е', 'и'],              // вИсела
+                ['а', 'о'],              // абАжуром
+                ['а', 'о'],              // прикОснуться
+                ['и', 'е'],              // обжИгающей
+                ['а', 'о'],              // схвАтил
+                ['и', 'е'],              // блЕстало
+                ['и', 'е'],              // зажИгаясь
+                ['о', 'а'],              // упОение
+                ['и', 'е'],              // удИвительный
+                ['о', 'а'],              // рАстений
+                ['и', 'е'],              // пробИрался
+                ['а', 'о'],              // мОллюсков
+                ['е', 'я', 'и'],         // поЯвилась
+                ['а', 'о'],              // водорОслей
+                ['о', 'а'],              // плАвники
+                ['а', 'о']               // предполАгали
+            ]
+        };
+
+        // ===== ФУНКЦИЯ ДЛЯ РАСШИФРОВКИ ОТВЕТОВ ===== //
+        function getCorrectAnswer(code) {
+            const alphabet = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+            return alphabet[code - 1];
+        }
+
+        // ===== ОСНОВНОЙ КОД ТРЕНАЖЕРА ===== //
+        const elements = {
+            enableBtn: document.getElementById('enableBtn'),
+            checkBtn: document.getElementById('checkBtn'),
+            gradeBtn: document.getElementById('gradeBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            nextBtn: document.getElementById('nextBtn'),
+            textContainer: document.getElementById('textContainer'),
+            gradeResult: document.getElementById('gradeResult'),
+            statsResult: document.getElementById('statsResult'),
+            buttonsContainer: document.getElementById('buttonsContainer'),
+            sideSoundBtn: document.getElementById('side-sound-btn'),
+            leftVideo: document.getElementById('left-video-element'),
+            authorSignature: document.getElementById('authorSignature'),
+            teamLabel: document.querySelector('.team-label')
+        };
+
+        let state = {
+            attempts: 0,
+            totalCorrect: 0,
+            totalQuestions: encryptedData.answers.length,
+            bestScore: 0,
+            soundEnabled: false,
+            teamScore: 0
+        };
+
+        // ===== СОЗДАНИЕ УПРАЖНЕНИЯ С ВЫПАДАЮЩИМИ СПИСКАМИ ===== //
+        function createExercise() {
+            let html = '';
+            let gapIndex = 0;
+            
+            for (let i = 0; i < encryptedData.text.length; i++) {
+                if (encryptedData.text.substr(i, 2) === 'XX') {
+                    html += `<span class="gap-container">
+                        <select class="gap-select" data-index="${gapIndex}">
+                            <option value=""></option>`; // Пустой вариант по умолчанию
+                    
+                    // Добавляем только те буквы, которые можно перепутать для данного пропуска
+                    encryptedData.possibleLetters[gapIndex].forEach(letter => {
+                        html += `<option value="${letter}">${letter}</option>`;
+                    });
+                    
+                    html += `</select></span>`;
+                    gapIndex++;
+                    i++;
+                } else {
+                    html += encryptedData.text[i];
+                }
+            }
+            
+            elements.textContainer.innerHTML = html;
+            setupSelectNavigation();
+            elements.authorSignature.style.display = 'block';
+        }
+
+        // ===== НАСТРОЙКА ПЕРЕХОДА МЕЖДУ ВЫПАДАЮЩИМИ СПИСКАМИ ===== //
+        function setupSelectNavigation() {
+            const selects = document.querySelectorAll('.gap-select');
+            
+            selects.forEach((select, index) => {
+                select.addEventListener('change', (e) => {
+                    if (index < selects.length - 1) {
+                        setTimeout(() => {
+                            selects[index + 1].focus();
+                        }, 10);
+                    }
+                });
+                
+                select.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft' && index > 0) {
+                        selects[index - 1].focus();
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowRight' && index < selects.length - 1) {
+                        selects[index + 1].focus();
+                        e.preventDefault();
+                    }
+                });
+            });
+            
+            if (selects.length > 0) {
+                selects[0].focus();
+            }
+        }
+
+        // ===== ПРОВЕРКА ОТВЕТОВ ===== //
+        function checkAnswers() {
+            let correctCount = 0;
+            document.querySelectorAll('.gap-select').forEach(select => {
+                const userAnswer = select.value.toLowerCase();
+                const correctAnswer = getCorrectAnswer(encryptedData.answers[parseInt(select.dataset.index)]);
+                
+                select.classList.remove('correct', 'incorrect');
+                select.classList.add(userAnswer === correctAnswer ? 'correct' : 'incorrect');
+                if (userAnswer === correctAnswer) correctCount++;
+            });
+            return correctCount;
+        }
+
+        // ===== СОХРАНЕНИЕ РЕЗУЛЬТАТА КОМАНДЫ ===== //
+        function saveTeamScore(score) {
+            localStorage.setItem('team2Score', score);
+        }
+
+        // ===== ОБРАБОТЧИКИ СОБЫТИЙ ===== //
+        elements.enableBtn.addEventListener('click', () => {
+            createExercise();
+            elements.checkBtn.style.display = 'flex';
+            elements.gradeBtn.style.display = 'flex';
+            elements.clearBtn.style.display = 'flex';
+            elements.enableBtn.style.display = 'none';
+            elements.teamLabel.style.display = 'none';
+        });
+
+        elements.checkBtn.addEventListener('click', () => {
+
+    const correct = checkAnswers();
+    state.attempts++;
+    state.totalCorrect += correct;
+    state.bestScore = Math.max(state.bestScore, correct);
+    
+    if (state.attempts === 1) {
+        state.teamScore = correct;
+        saveTeamScore(correct);
+    }
+    
+    elements.gradeResult.textContent = `Правильных ответов: ${correct} из ${state.totalQuestions}`;
+    elements.statsResult.textContent = `Попыток: ${state.attempts} | Лучший: ${state.bestScore}/${state.totalQuestions}`;
+    
+    elements.gradeResult.style.display = 'block';
+    elements.statsResult.style.display = 'block';
+
+    if (correct >= 14) {
+
+        // выключаем звук, если он был включён
+        elements.leftVideo.muted = true;
+        state.soundEnabled = false;
+        elements.sideSoundBtn.innerHTML = '🔇 Включить звук';
+
+        // сообщаем основной странице
+        window.parent.postMessage({ type: "tabletSuccess" }, "*");
+    }
+
+});
+
+        elements.gradeBtn.addEventListener('click', () => {
+            const correct = checkAnswers();
+            const percentage = Math.round((correct / state.totalQuestions) * 100);
+            const grade = percentage >= 90 ? "5" : percentage >= 75 ? "4" : percentage >= 50 ? "3" : "2";
+            
+            elements.gradeResult.textContent = `Оценка: ${grade} (${percentage}%)`;
+            elements.statsResult.textContent = `Правильно: ${correct} из ${state.totalQuestions}`;
+            elements.gradeResult.style.display = 'block';
+            elements.statsResult.style.display = 'block';
+        });
+
+        elements.clearBtn.addEventListener('click', () => {
+            document.querySelectorAll('.gap-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'incorrect');
+            });
+            elements.gradeResult.style.display = 'none';
+            elements.statsResult.style.display = 'none';
+        });
+
+        // Управление звуком видео медузы
+        elements.sideSoundBtn.addEventListener('click', function() {
+            state.soundEnabled = !state.soundEnabled;
+            elements.leftVideo.muted = !state.soundEnabled;
+            this.innerHTML = state.soundEnabled ? '🔊 Выключить звук' : '🔇 Включить звук';
+            if (state.soundEnabled) elements.leftVideo.play().catch(e => console.log("Ошибка воспроизведения:", e));
+        });
+
+        // Инициализация состояния звука
+        elements.leftVideo.muted = true;
+        elements.sideSoundBtn.innerHTML = '🔇 Включить звук';
+        state.soundEnabled = false;
+
+        // Запуск видео при первом клике
+        document.body.addEventListener('click', () => {
+            elements.leftVideo.play().catch(e => console.log("Ошибка видео:", e));
+        }, { once: true });
+    </script>
+</body>
+</html>
