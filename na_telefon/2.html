@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Тетрис (HTML/JS) — Pro</title>
+  <link rel="stylesheet" href="2.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card game">
+      <div class="game-title">Правописание словарных слов</div>
+      <div class="canvas-row">
+        <canvas id="board" width="312" height="520" aria-label="Тетрис поле"></canvas>
+        <canvas id="next" width="140" height="140" aria-label="Следующая фигура"></canvas>
+      </div>
+      <div class="field-note">
+        <div>Клик по полю — фокус. На телефоне используй кнопки.</div>
+        <div class="pill" id="mode">RUN</div>
+      </div>
+    </div>
+
+    <div class="card side">
+      <div>
+        <h1>Тетрис Pro</h1>
+        <div class="stat">
+          <div class="k">Очки</div><div class="v" id="score">0</div>
+          <div class="k">Линии</div><div class="v" id="lines">0</div>
+          <div class="k">Уровень</div><div class="v" id="level">1</div>
+          <div class="k">Скорость</div><div class="v" id="speed">1.00x</div>
+          <div class="k">Рекорд</div><div class="v" id="best">0</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnStart">Старт</button>
+        <button id="btnPause">Пауза (P)</button>
+        <button id="btnRestart">Рестарт (R)</button>
+        <button id="btnResetDown">Сбросить вниз</button>
+      </div>
+
+      <div class="row">
+        <div class="toggle" id="toggleSound" role="button" tabindex="0">
+          <span>Звук</span><span class="pill" id="soundPill">ON</span>
+        </div>
+        <div class="toggle" id="toggleGhost" role="button" tabindex="0">
+          <span>Призрак</span><span class="pill" id="ghostPill">ON</span>
+        </div>
+      </div>
+
+      <div class="hint">
+        <div><span class="kbd">←</span> <span class="kbd">→</span> двигать</div>
+        <div><span class="kbd">↑</span> поворот (SRS)</div>
+        <div><span class="kbd">↓</span> ускорить</div>
+        <div><span class="kbd">Space</span> бросить вниз</div>
+        <div><span class="kbd">P</span> пауза • <span class="kbd">R</span> рестарт</div>
+      </div>
+
+      <div class="hint" id="status" style="border-style:solid; border-color: rgba(255,255,255,0.12);">
+        Готово. Жми любую клавишу или кнопку на экране, чтобы начать.
+      </div>
+
+      <div class="leader-inline">
+        <h3>Таблица лидеров</h3>
+        <div id="leaderboardInline">Пока нет записей.</div>
+        <div style="margin-top:8px">
+          <button id="openLeaderBtn">Полная таблица</button>
+        </div>
+      </div>
+
+      <div class="mobile" aria-label="Мобильное управление">
+        <div class="pad">
+          <button class="accent" id="mLeft">◀︎</button>
+          <button class="accent" id="mRotate">⤾</button>
+          <button class="accent" id="mRight">▶︎</button>
+          <button id="mDown">▼</button>
+          <button class="danger" id="mDrop">DROP</button>
+          <button id="mPause">P</button>
+          <button class="wide" id="mRestart">RESTART</button>
+        </div>
+      </div>
+    </div>
+      <script src="quiz_words.js"></script>
+      <!-- Quiz modal -->
+      <div id="quizOverlay" style="display:none">
+        <div class="quiz-modal">
+            <div class="quiz-header">Безударные гласные в корне слова</div>
+            <div id="quizBonus" class="quiz-bonus">Максимум бонуса: 500</div>
+            <div id="quizCurrentBonus" class="quiz-current-bonus">Бонус сейчас: 0</div>
+          <div id="quizPrompt" class="quiz-prompt"></div>
+          <div id="quizSelection" class="quiz-selection" aria-live="polite"></div>
+          <div class="quiz-controls">
+            <button id="quizBack" title="Удалить последний">←</button>
+            <button id="quizClear" title="Очистить выбор">Очистить</button>
+            <button id="quizConfirm" title="Подтвердить" disabled>Подтвердить</button>
+          </div>
+          <div id="quizTimer" class="quiz-timer">00.0s</div>
+          <div id="quizOptions" class="quiz-options"></div>
+          <div id="quizAward" class="quiz-award" style="display:none">+0</div>
+        </div>
+      </div>
+
+      <!-- Leaderboard modal -->
+      <div id="leaderOverlay" style="display:none">
+        <div class="leader-modal">
+          <h3>Таблица лидеров</h3>
+          <div id="leaderList"></div>
+          <div id="saveRecordArea">
+            <input id="recordName" placeholder="Ваше имя" />
+            <button id="saveRecordBtn">Сохранить рекорд</button>
+          </div>
+          <button id="closeLeader">Закрыть</button>
+        </div>
+      </div>
+
+      <script src="2.js"></script>
+    
+      <script>
+
+      document.addEventListener("click", function(e){
+
+    if(e.target && e.target.id === "saveRecordBtn"){
+
+        // сообщаем главной странице, что игра завершена
+        window.parent.postMessage({ type: "playSuccess" }, "*");
+
+    }
+
+});
+
+   </script>
+  </body>
+  </html>

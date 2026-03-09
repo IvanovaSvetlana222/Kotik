@@ -1,0 +1,52 @@
+// Quiz words for "Безударные гласные в корне слова"
+// New format: each item is { full: 'слово', prompt: 'сло_о' (optional), answers: ['а','о'], type: 'проверяемая'|'чередующаяся'|'словарное' }
+// You can edit `answers` to specify which letter(s) should be accepted for the blank(s).
+window.QUIZ_WORDS = [
+	// Only user-provided entries
+	{ full: 'кампания (мероприятие)', prompt: 'к_мпания (мероприятие)', answers: ['а'], options: ['а','о'], type: 'словарное' },
+	{ full: 'каморка', prompt: 'к_морка', answers: ['а'], options: ['а','о'], type: 'словарное' },
+	{ full: 'каникулы', prompt: 'к_никулы', answers: ['а'], options: ['о','а'], type: 'словарное' },
+	{ full: 'канитель', prompt: 'к_н_тель', answers: ['а','и'], options: ['а','о','е','и'], type: 'словарное' },
+	{ full: 'канонада', prompt: 'к_н_нада', answers: ['а','о'], options: ['о','а'], type: 'словарное' },
+	{ full: 'канцелярия', prompt: 'к_нц_лярия', answers: ['а','е'], options: ['а','о','е','и','ы'], type: 'словарное' },
+	{ full: 'капюшон', prompt: 'к_п_ш_н', answers: ['а','ю','о'], options: ['а','о','е','и','ю','ё'], type: 'словарное' },
+	{ full: 'кардинальный', prompt: 'к_рд_нальный', answers: ['а','и'], options: ['о','а','я','е','и'], type: 'словарное' },
+	{ full: 'карикатура', prompt: 'к_р_катура', answers: ['а','и'], options: ['о','а','е','и'], type: 'словарное' },
+	{ full: 'касатка (ласточка)', prompt: 'к_сатка (ласточка)', answers: ['а'], options: ['а','о'], type: 'словарное' },
+	{ full: 'катакомбы', prompt: 'к_т_комбы', answers: ['а','а'], options: ['а','о'], type: 'словарное' },
+	{ full: 'катастрофа', prompt: 'к_т_строфа', answers: ['а','а'], options: ['а','о'], type: 'словарное' },
+	{ full: 'квалификация', prompt: 'кв_л_ф_кац_я', answers: ['а','и','и','и'], options: ['а','о','е','и','ы'], type: 'словарное' },
+	{ full: 'квитанция', prompt: 'кв_танц_я', answers: ['и','и'], options: ['е','и','ы','я'], type: 'словарное' },
+	{ full: 'кинематограф', prompt: 'к_н_м_тограф', answers: ['и','е','а'], options: ['е','и','о','а'], type: 'словарное' },
+	{ full: 'коварный', prompt: 'к_варный', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'колдун', prompt: 'к_лдун', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'колдовской', prompt: 'к_лд_вской', answers: ['о','о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'колебание', prompt: 'к_л_бание', answers: ['о','е'], options: ['а','о','е','и','я'], type: 'словарное' },
+	{ full: 'коллектив', prompt: 'к_лл_ктив', answers: ['о','е'], options: ['а','о','е','и'], type: 'словарное' },
+	{ full: 'коллекция', prompt: 'к_ллекц_я', answers: ['о','и'], options: ['а','о','е','и','ы'], type: 'словарное' },
+	{ full: 'коллекционный', prompt: 'колл_кц_онный', answers: ['е','и'], options: ['е','и','ы'], type: 'словарное' },
+	{ full: 'колоссальный', prompt: 'к_л_ссальный', answers: ['о','о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'колыхать', prompt: 'к_лыхать', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'комбинация', prompt: 'к_мб_нац_я', answers: ['о','и','и'], options: ['а','о','е','ы','и'], type: 'словарное' },
+	{ full: 'комедийный', prompt: 'к_м_дийный', answers: ['о','е'], options: ['а','о','е','и'], type: 'словарное' },
+	{ full: 'компания (группа людей, фирма)', prompt: 'к_мпания (группа людей, фирма)', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'компетенция', prompt: 'к_мп_т_нция', answers: ['о','е','е'], options: ['а','о','е','и'], type: 'словарное' },
+	{ full: 'компонент', prompt: 'к_мп_нент', answers: ['о','о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'компьютерный', prompt: 'к_мпьют_рный', answers: ['о','е','е'], options: ['а','о','е','и','э'], type: 'словарное' },
+	{ full: 'комфортный', prompt: 'к_мфортный', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'конверт', prompt: 'к_нверт', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'конкурент', prompt: 'к_нкурент', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'континент', prompt: 'к_нт_нент', answers: ['о','и'], options: ['а','о','е','и'], type: 'словарное' },
+	{ full: 'конференция', prompt: 'к_нф_ренц_я', answers: ['о','е','и'], options: ['а','о','и','е','ы'], type: 'словарное' },
+	{ full: 'конфликтовать', prompt: 'к_нфл_ктовать', answers: ['о','и'], options: ['а','о','и','е'], type: 'словарное' },
+	{ full: 'конфорка', prompt: 'к_нфорка', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'корифей', prompt: 'к_р_фей', answers: ['о','и'], options: ['а','о','е','и'], type: 'словарное' },
+	{ full: 'коричневый', prompt: 'к_ричневый', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'корзина', prompt: 'к_рзина', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'королевство', prompt: 'к_р_левство', answers: ['о','о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'косатка (дельфин)', prompt: 'к_сатка (дельфин)', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'космос', prompt: 'косм_с', answers: ['о'], options: ['а','о'], type: 'словарное' },
+	{ full: 'кромешный', prompt: 'кр_мешный', answers: ['о'], options: ['а','о'], type: 'словарное' }
+];
+
+
