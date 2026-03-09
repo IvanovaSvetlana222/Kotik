@@ -1,0 +1,2907 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новогодние задания - 20 шариков</title>
+    <!-- Подключаем шрифт Lobster -->
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            background-color: #3498db;
+            user-select: none;
+            touch-action: pan-y;
+        }
+
+        #video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #3498db;
+        }
+
+        #video-background {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Fallback для видео */
+        #video-fallback {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            z-index: -2;
+            display: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ИНСТРУКЦИЯ */
+        #instruction-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #instruction-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        #instruction-content {
+            position: relative;
+            top: -5%;
+            text-align: center;
+            left: -1%;
+            width: 50%;
+            max-width: 800px;
+            border-radius: 15px;
+            overflow: visible;
+            padding: 10px;
+        }
+
+        #instruction-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+        }
+
+        /* КОНТЕЙНЕР ДЛЯ КНОПОК ИНСТРУКЦИИ */
+        .instruction-buttons {
+            position: fixed;
+            top: 445px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #instruction-overlay.active .instruction-buttons {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ОБЩИЕ СТИЛИ ДЛЯ КНОПОК ИНСТРУКЦИИ */
+        .instruction-button {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            background: transparent;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: snowflakeFloat 3s ease-in-out infinite;
+        }
+
+        /* СНЕЖИНКА (ЗАКРЫТИЕ) */
+        #close-instruction {
+            transform: translateX(-30px);
+        }
+
+        /* Голубая снежинка с синим свечением */
+        #close-instruction::before {
+            content: "❄";
+            position: absolute;
+            font-size: 52px;
+            color: #87ceeb;
+            text-shadow: 
+                0 0 15px rgba(135, 206, 235, 1),
+                0 0 30px rgba(135, 206, 235, 0.8),
+                0 0 45px rgba(135, 206, 235, 0.6),
+                0 0 60px rgba(30, 144, 255, 0.4);
+            z-index: 1;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Белый крестик в самом центре снежинки */
+        #close-instruction::after {
+            content: "×";
+            position: absolute;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 
+                0 0 8px rgba(255, 255, 255, 1),
+                0 0 16px rgba(255, 255, 255, 0.8),
+                0 0 24px rgba(255, 255, 255, 0.6);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            transform: translateY(-1px);
+            pointer-events: none;
+        }
+
+        /* КНОПКА МУЗЫКИ */
+        #music-toggle {
+            transform: translateX(30px);
+        }
+
+        /* Музыкальные нотки с голубым свечением */
+        #music-toggle::before {
+            content: "♫";
+            position: absolute;
+            font-size: 36px;
+            color: #87ceeb;
+            text-shadow: 
+                0 0 15px rgba(135, 206, 235, 1),
+                0 0 30px rgba(135, 206, 235, 0.8),
+                0 0 45px rgba(135, 206, 235, 0.6),
+                0 0 60px rgba(135, 206, 235, 0.4);
+            z-index: 1;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Кружок в центре для отключенного состояния */
+        #music-toggle::after {
+            content: "";
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Состояние "музыка выключена" */
+        #music-toggle.muted::after {
+            content: "×";
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 1;
+        }
+
+        /* Анимация плавного парения */
+        @keyframes snowflakeFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-5px) rotate(30deg);
+            }
+            75% {
+                transform: translateY(5px) rotate(-30deg);
+            }
+        }
+
+        /* ХОВЕР ЭФФЕКТЫ */
+        .instruction-button:hover {
+            transform: scale(1.2);
+        }
+
+        #close-instruction:hover::before {
+            color: #b3e5fc;
+            text-shadow: 
+                0 0 20px rgba(179, 229, 252, 1),
+                0 0 40px rgba(135, 206, 235, 0.9),
+                0 0 60px rgba(30, 144, 255, 0.7),
+                0 0 80px rgba(30, 144, 255, 0.5);
+        }
+
+        #close-instruction:hover::after {
+            color: #ffffff;
+            text-shadow: 
+                0 0 12px rgba(255, 255, 255, 1),
+                0 0 24px rgba(255, 255, 255, 0.9),
+                0 0 36px rgba(255, 255, 255, 0.7);
+        }
+
+        #music-toggle:hover::before {
+            color: #b3e5fc;
+            text-shadow: 
+                0 0 20px rgba(179, 229, 252, 1),
+                0 0 40px rgba(135, 206, 235, 0.9),
+                0 0 60px rgba(30, 144, 255, 0.7),
+                0 0 80px rgba(30, 144, 255, 0.5);
+        }
+
+        @keyframes snowflakeSpin {
+            0% {
+                transform: scale(1) rotate(0deg);
+            }
+            100% {
+                transform: scale(1.2) rotate(180deg);
+            }
+        }
+
+        /* ОСТАЛЬНЫЕ СТИЛИ */
+        .side-ball {
+            position: fixed;
+            width: 200px;
+            height: auto;
+            z-index: 5;
+            animation: swing 3s ease-in-out infinite alternate;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.6)) 
+                   drop-shadow(0 12px 30px rgba(255, 215, 0, 0.1));
+        }
+
+        .side-ball.left {
+            left: 40px;
+            top: -60px;
+            animation-delay: 0.5s;
+        }
+
+        .side-ball.right {
+            right: 40px;
+            top: -60px;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes swing {
+            0% {
+                transform: translateY(0) rotate(-8deg);
+            }
+            100% {
+                transform: translateY(25px) rotate(8deg);
+            }
+        }
+
+        #korobka {
+            position: fixed;
+            left: 50%;
+            bottom: -200px;
+            transform: translateX(-50%) scaleX(-1);
+            width: 180px;
+            height: auto;
+            z-index: 8;
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.7))
+                    drop-shadow(0 5px 10px rgba(0, 0, 0, 0.4))
+                    drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+            opacity: 0;
+            transition: all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+        }
+
+        #korobka.visible {
+            opacity: 1;
+            bottom: 28px;
+            animation: korobkaGlow 2s ease-in-out infinite alternate;
+            transform: translateX(-50%) scaleX(-1);
+        }
+
+        @keyframes korobkaGlow {
+            0% {
+                filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5)) brightness(1);
+            }
+            100% {
+                filter: drop-shadow(0 15px 30px rgba(255, 215, 0, 0.3)) brightness(1.1);
+            }
+        }
+
+        /* ШАРИК С ЗАДАНИЕМ */
+        #ball-container {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #ball-container.rising {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.5);
+            pointer-events: auto;
+        }
+
+        #ball-container.with-task {
+            opacity: 1;
+            transform: translateX(-50%) scale(1.5);
+            animation: floatBall 2s ease-in-out infinite;
+            pointer-events: auto;
+        }
+
+        #ball-container.shrink-fall-break {
+            opacity: 1 !important;
+            pointer-events: none !important;
+            animation: shrinkFallAndBreak 2s ease-in forwards !important;
+            will-change: transform, opacity;
+        }
+
+        #new-year-ball {
+            width: 220px;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.5))
+                    drop-shadow(0 20px 40px rgba(255, 215, 0, 0.15));
+        }
+
+        /* ШАРИКИ НА ЁЛКЕ */
+        .tree-ball {
+            position: fixed;
+            width: 70px;
+            height: 70px;
+            cursor: default;
+            z-index: 90;
+            border-radius: 50%;
+            object-fit: contain;
+            object-position: center;
+            pointer-events: none;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5))
+                    drop-shadow(0 0 25px rgba(255, 215, 0, 0.8))
+                    drop-shadow(0 0 50px rgba(255, 215, 0, 0.4));
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        /* ОСКОЛКИ ШАРИКА */
+        .shard {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52, #ffd700, #ff8c00);
+            border-radius: 50%;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+        }
+
+        /* МАССИВНОЕ ОБЛАКО ЗОЛОТОЙ ПЫЛИ */
+        .gold-dust-particle {
+            position: fixed;
+            z-index: 89;
+            pointer-events: none;
+            opacity: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(255, 215, 0, 0.9) 0%,
+                rgba(255, 215, 0, 0.5) 40%,
+                rgba(255, 215, 0, 0.2) 70%,
+                transparent 100%);
+            filter: blur(0.5px);
+        }
+
+        .star-particle {
+            position: fixed;
+            z-index: 89;
+            pointer-events: none;
+            opacity: 0;
+            color: gold;
+            text-shadow: 
+                0 0 2px rgba(255, 215, 0, 0.8),
+                0 0 4px rgba(255, 215, 0, 0.6);
+            font-size: 3px;
+        }
+
+        /* АНИМАЦИИ ДЛЯ МАССИВНОГО ОБЛАКА ПЫЛИ */
+        @keyframes dustOrbitFast1 {
+            0% {
+                transform: rotate(0deg) translateX(40px) rotate(0deg) scale(0.8);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: rotate(720deg) translateX(40px) rotate(-720deg) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dustOrbitFast2 {
+            0% {
+                transform: rotate(30deg) translateX(45px) rotate(-30deg) scale(0.7);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotate(750deg) translateX(45px) rotate(-750deg) scale(0.7);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dustOrbitFast3 {
+            0% {
+                transform: rotate(60deg) translateX(50px) rotate(-60deg) scale(0.6);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.4;
+            }
+            90% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: rotate(780deg) translateX(50px) rotate(-780deg) scale(0.6);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dustOrbitFast4 {
+            0% {
+                transform: rotate(90deg) translateX(55px) rotate(-90deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: rotate(810deg) translateX(55px) rotate(-810deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dustOrbitFast5 {
+            0% {
+                transform: rotate(120deg) translateX(60px) rotate(-120deg) scale(0.4);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.2;
+            }
+            90% {
+                opacity: 0.2;
+            }
+            100% {
+                transform: rotate(840deg) translateX(60px) rotate(-840deg) scale(0.4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dustOrbitFast6 {
+            0% {
+                transform: rotate(150deg) translateX(65px) rotate(-150deg) scale(0.3);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: rotate(870deg) translateX(65px) rotate(-870deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dustOrbitFast7 {
+            0% {
+                transform: rotate(180deg) translateX(70px) rotate(-180deg) scale(0.2);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.05;
+            }
+            90% {
+                opacity: 0.05;
+            }
+            100% {
+                transform: rotate(900deg) translateX(70px) rotate(-900deg) scale(0.2);
+                opacity: 0;
+            }
+        }
+
+        /* Анимации для хаотичного движения сотен частиц */
+        @keyframes dustSwarm1 {
+            0% {
+                transform: translate(0, 0) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.4;
+                transform: translate(-20px, -15px) scale(0.8);
+            }
+            40% {
+                opacity: 0.3;
+                transform: translate(-30px, 10px) scale(0.7);
+            }
+            60% {
+                opacity: 0.4;
+                transform: translate(15px, -25px) scale(0.6);
+            }
+            80% {
+                opacity: 0.3;
+                transform: translate(25px, 20px) scale(0.5);
+            }
+            100% {
+                transform: translate(40px, -40px) scale(0.4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dustSwarm2 {
+            0% {
+                transform: translate(0, 0) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.4;
+                transform: translate(25px, -10px) scale(0.8);
+            }
+            40% {
+                opacity: 0.3;
+                transform: translate(35px, 15px) scale(0.7);
+            }
+            60% {
+                opacity: 0.4;
+                transform: translate(-10px, -30px) scale(0.6);
+            }
+            80% {
+                opacity: 0.3;
+                transform: translate(-20px, 25px) scale(0.5);
+            }
+            100% {
+                transform: translate(-35px, -35px) scale(0.4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes dustSwarm3 {
+            0% {
+                transform: translate(0, 0) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.4;
+                transform: translate(-15px, 20px) scale(0.8);
+            }
+            40% {
+                opacity: 0.3;
+                transform: translate(-25px, -15px) scale(0.7);
+            }
+            60% {
+                opacity: 0.4;
+                transform: translate(30px, 10px) scale(0.6);
+            }
+            80% {
+                opacity: 0.3;
+                transform: translate(20px, -20px) scale(0.5);
+            }
+            100% {
+                transform: translate(35px, 30px) scale(0.4);
+                opacity: 0;
+            }
+        }
+
+        /* Анимация для мерцания */
+        @keyframes dustTwinkleFast {
+            0%, 100% {
+                opacity: 0.1;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes dustTwinkleSlow {
+            0%, 100% {
+                opacity: 0.05;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes floatBall {
+            0%, 100% { transform: translateX(-50%) scale(1.5) translateY(0); }
+            50% { transform: translateX(-50%) scale(1.5) translateY(-15px); }
+        }
+
+        /* АНИМАЦИЯ ПАДЕНИЯ */
+        @keyframes shrinkFallAndBreak {
+            0% {
+                transform: translateX(-50%) translateY(0) scale(1.5);
+                opacity: 1;
+            }
+            25% {
+                transform: translateX(-50%) translateY(20vh) scale(1.2);
+                opacity: 0.9;
+            }
+            50% {
+                transform: translateX(-50%) translateY(40vh) scale(0.8);
+                opacity: 0.8;
+            }
+            75% {
+                transform: translateX(-50%) translateY(60vh) scale(0.4) rotate(180deg);
+                opacity: 0.6;
+            }
+            90% {
+                transform: translateX(-50%) translateY(80vh) scale(0.15) rotate(360deg);
+                opacity: 0.3;
+                filter: blur(3px);
+            }
+            100% {
+                transform: translateX(-50%) translateY(120vh) scale(0) rotate(540deg);
+                opacity: 0;
+                filter: blur(5px);
+            }
+        }
+
+        @keyframes pickFromBox {
+            0% {
+                transform: translateX(-50%) scale(1.5);
+                opacity: 1;
+            }
+            30% {
+                transform: translateX(-50%) scale(1.3);
+                top: 130px;
+                opacity: 0.9;
+            }
+            60% {
+                transform: translateX(-50%) scale(1.0);
+                top: 210px;
+                opacity: 0.8;
+            }
+            90% {
+                transform: translateX(-50%) scale(0.9);
+                top: 260px;
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateX(-50%) scale(0.9);
+                opacity: 1;
+                top: 280px;
+            }
+        } 
+         
+        #ball-container.picking-from-box {
+            opacity: 1 !important;
+            pointer-events: none !important;
+            animation: pickFromBox 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            z-index: 30 !important;
+            will-change: transform, top;
+            backface-visibility: hidden;
+        }
+
+        /* АНИМАЦИЯ ОСКОЛКОВ */
+        @keyframes shard1 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-60px, 120px) scale(0); opacity: 0; }
+        }
+
+        @keyframes shard2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(80px, 100px) scale(0); opacity: 0; }
+        }
+
+        @keyframes shard3 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-40px, 80px) scale(0); opacity: 0; }
+        }
+
+        @keyframes shard4 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(60px, 60px) scale(0); opacity: 0; }
+        }
+
+        @keyframes shard5 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(0, 150px) scale(0); opacity: 0; }
+        }
+
+        @keyframes shard6 {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-80px, 60px) scale(0); opacity: 0; }
+        }
+
+        /* ТЕКСТ НА ШАРИКЕ */
+        .ball-text {
+            position: absolute;
+            top: 53%; 
+            left: 50%;
+            transform: translateX(-50%);
+            color: #000;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 16;
+            pointer-events: none;
+            width: 85%;
+            padding: 8px 5px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            transition: opacity 0.5s ease;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hint-text {
+            font-size: 14px;
+            color: #444;
+            margin-top: 3px;
+            display: block;
+            white-space: normal;
+        }
+
+        /* КНОПКИ С БУКВАМИ */
+        .letter-options {
+            position: absolute;
+            top: 73% !important;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 17;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 85%;
+        }
+
+        .letter-option {
+            width: 40px !important;
+            height: 40px !important;
+            background: linear-gradient(45deg, #ff9800, #ffb74d, #ff9800, #ffcc80, #ff9800);
+            background-size: 400% 400%;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px !important;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: gradientShift 3s ease infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .letter-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .letter-option.correct {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            transform: scale(1.1);
+        }
+
+        .letter-option.wrong {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        /* ОБНОВЛЕННЫЙ СЧЕТЧИК */
+        #counter {
+            position: fixed;
+            top: auto;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9, #1c6ea4);
+            padding: 15px 25px;
+            border-radius: 20px;
+            z-index: 25;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid #87ceeb;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .counter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .counter-value {
+            color: #ffd700;
+            font-size: 28px;
+            min-width: 40px;
+            text-align: right;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* КНОПКА ПРОВЕРИТЬ */
+        #check-button {
+            position: fixed;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #87ceeb, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 30;
+            display: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4),
+                        0 0 30px rgba(135, 206, 235, 0.5);
+            border: 2px solid white;
+            transition: all 0.3s ease;
+            animation: buttonGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes buttonGlow {
+            0% {
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4),
+                            0 0 30px rgba(135, 206, 235, 0.5);
+            }
+            100% {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5),
+                            0 0 40px rgba(135, 206, 235, 0.7);
+            }
+        }
+
+        #check-button:hover {
+            transform: translateX(-50%) scale(1.05);
+            background: linear-gradient(135deg, #b3e5fc, #3498db, #2980b9);
+        }
+
+        /* ОБНОВЛЕННАЯ ТАБЛИЧКА С РЕЗУЛЬТАТАМИ */
+        #result-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: transparent !important;
+            padding: 40px;
+            border-radius: 0 !important;
+            z-index: 1000;
+            text-align: center;
+            display: none;
+            border: none !important;
+            box-shadow: none !important;
+            color: white;
+            max-width: 800px;
+            width: 90%;
+            backdrop-filter: none !important;
+        }
+
+        #result-message h1 {
+            font-family: 'Lobster', cursive !important;
+            color: #ffd700;
+            font-size: 48px;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8),
+                         0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        #result-message h2 {
+            font-family: 'Lobster', cursive !important;
+            color: #87ceeb;
+            font-size: 42px;
+            margin: 20px 0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8),
+                         0 0 15px rgba(135, 206, 235, 0.6);
+        }
+
+        #result-message p {
+            font-family: 'Lobster', cursive !important;
+            font-size: 36px;
+            margin: 15px 0;
+            line-height: 1.5;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        /* КНОПКА ЗАКРЫТЬ для оценок 4 и 5 */
+        #close-result-button {
+            position: fixed;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #87ceeb, #3498db);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 1001;
+            display: none;
+            border: 2px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4),
+                        0 0 20px rgba(135, 206, 235, 0.5);
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #close-result-button:hover {
+            transform: translateX(-50%) scale(1.05);
+            background: linear-gradient(135deg, #b3e5fc, #3498db);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5),
+                        0 0 25px rgba(135, 206, 235, 0.7);
+        }
+
+        .result-button {
+            background: linear-gradient(135deg, #87ceeb, #3498db);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+            min-width: 180px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .result-button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #b3e5fc, #3498db);
+            box-shadow: 0 5px 15px rgba(135, 206, 235, 0.5);
+        }
+
+        #restart-button {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        #restart-button:hover {
+            background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+        }
+
+        /* МАЛЕНЬКИЙ ШАРИК */
+        .tiny-ball {
+            position: fixed;
+            width: 90px !important;
+            height: 90px !important;
+            cursor: grab;
+            z-index: 95;
+            opacity: 1;
+            pointer-events: auto;
+            border-radius: 50% !important;
+            object-fit: contain !important;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.6))
+                    drop-shadow(0 0 30px rgba(255, 215, 0, 0.9))
+                    drop-shadow(0 0 60px rgba(255, 215, 0, 0.5));
+            animation: glowPulseFast 1.5s ease-in-out infinite;
+            touch-action: none;
+        }
+
+        /* АНИМАЦИИ ПЕРЕЛИВАЮЩЕСЯ СВЕЧЕНИЯ */
+        @keyframes glowPulse {
+            0%, 100% {
+                filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5))
+                        drop-shadow(0 0 20px rgba(255, 215, 0, 0.7))
+                        drop-shadow(0 0 40px rgba(255, 215, 0, 0.3));
+            }
+            50% {
+                filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5))
+                        drop-shadow(0 0 35px rgba(255, 215, 0, 0.9))
+                        drop-shadow(0 0 70px rgba(255, 215, 0, 0.5));
+            }
+        }
+
+        @keyframes glowPulseFast {
+            0%, 100% {
+                filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.6))
+                        drop-shadow(0 0 25px rgba(255, 215, 0, 0.8))
+                        drop-shadow(0 0 50px rgba(255, 215, 0, 0.4));
+            }
+            50% {
+                filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.6))
+                        drop-shadow(0 0 40px rgba(255, 215, 0, 1.0))
+                        drop-shadow(0 0 80px rgba(255, 215, 0, 0.6));
+            }
+        }
+
+        /* СНЕГУРОЧКА */
+        #snegurka-button {
+            position: fixed;
+            left: 470px;
+            bottom: 50px;
+            width: 180px; /* УВЕЛИЧЕНО с 150px до 200px */
+            opacity: 0;
+            cursor: pointer;
+            transition: opacity 3s ease-in-out;
+            transform-origin: bottom center;
+            z-index: 100;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5)) 
+                    drop-shadow(0 10px 25px rgba(255, 255, 255, 0.2))
+                    drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+        #snegurka-button.visible {
+            opacity: 1;
+        }
+
+        #snegurka-button img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* ЗОЛОТОЕ СИЯНИЕ СНЕГУРОЧКИ */
+        #snegurka-glow {
+            position: fixed;
+            left: 410px;  /* немного левее Снегурки */
+            bottom: -10px; /* немного ниже Снегурки */
+            width: 280px;  /* больше чем Снегурка */
+            height: 280px;
+            pointer-events: none;
+            z-index: 99;   /* под Снегуркой */
+            opacity: 0.7;
+            animation: snegurkaGlow 3s ease-in-out infinite alternate;
+            border-radius: 50%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(255, 215, 0, 0.4) 0%,
+                rgba(255, 215, 0, 0.2) 40%,
+                rgba(255, 215, 0, 0.1) 60%,
+                transparent 80%
+            );
+            filter: blur(15px);
+        }
+
+        @keyframes snegurkaGlow {
+            0% {
+                opacity: 0.5;
+                transform: scale(0.95);
+                filter: blur(15px);
+            }
+            100% {
+                opacity: 0.8;
+                transform: scale(1.05);
+                filter: blur(20px) brightness(1.2);
+            }
+        }
+
+        /* Частицы вокруг Снегурки */
+        .snegurka-particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            background: radial-gradient(circle, 
+                rgba(255, 215, 0, 0.9) 0%,
+                rgba(255, 215, 0, 0.4) 70%,
+                transparent 100%);
+            animation: snegurkaParticleFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes snegurkaParticleFloat {
+            0%, 100% {
+                transform: translate(0, 0) scale(0.8);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(15px, -20px) scale(1.2);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translate(-10px, 10px) scale(0.9);
+                opacity: 0.5;
+            }
+            75% {
+                transform: translate(-20px, -10px) scale(1.1);
+                opacity: 0.6;
+            }
+        }
+
+        #win-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            z-index: 1000;
+            text-align: center;
+            display: none;
+            border: 3px solid gold;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            color: white;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        #win-message h1 {
+            color: gold;
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        #close-message {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* СТИЛИ ДЛЯ ФЕИ */
+        #fairy-container {
+            position: fixed;
+            z-index: 110;
+            display: none;
+            pointer-events: none;
+        }
+
+        #fairy {
+            width: 90px;
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8))
+                    drop-shadow(0 0 30px rgba(255, 215, 0, 0.6));
+            animation: fairyFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes fairyFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-15px) scale(1.05);
+            }
+        }
+
+        @keyframes wandGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8))
+                        drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+            }
+            50% {
+                filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1))
+                        drop-shadow(0 0 40px rgba(255, 215, 0, 0.8));
+            }
+        }
+
+        /* МЕДИАЗАПРОСЫ */
+        @media (max-width: 768px) {
+            #new-year-ball {
+                width: 200px !important;
+            }
+            
+            .ball-text {
+                font-size: 16px !important;
+                padding: 6px 4px !important;
+            }
+            
+            .letter-option {
+                width: 36px !important;
+                height: 36px !important;
+                font-size: 18px !important;
+            }
+            
+            #snegurka-glow {
+                left: -15px !important;
+                bottom: -5px !important;
+                width: 200px !important;
+                height: 200px !important;
+            }
+            
+            #snegurka-button {
+                left: 20px !important;
+                width: 140px !important; /* Адаптировано */
+            }
+            
+            #instruction-content {
+                max-width: 95%;
+                max-height: 95%;
+            }
+            
+            .instruction-button {
+                width: 50px;
+                height: 50px;
+            }
+            
+            #close-instruction {
+                transform: translateX(-20px);
+            }
+            
+            #music-toggle {
+                transform: translateX(20px);
+            }
+            
+            #close-instruction::before {
+                font-size: 40px;
+            }
+            
+            #close-instruction::after {
+                font-size: 16px;
+            }
+            
+            #music-toggle::before {
+                font-size: 36px;
+            }
+            
+            .instruction-buttons {
+                top: 400px;
+                gap: 20px;
+            }
+            
+            #counter {
+                padding: 12px 20px;
+                font-size: 18px;
+                bottom: 15px;
+                right: 15px;
+            }
+            
+            .counter-value {
+                font-size: 24px;
+            }
+            
+            #check-button {
+                padding: 12px 30px;
+                font-size: 20px;
+                bottom: 20px;
+            }
+            
+            #result-message h1 {
+                font-size: 36px;
+            }
+            
+            #result-message h2 {
+                font-size: 32px;
+            }
+            
+            #result-message p {
+                font-size: 28px;
+            }
+            
+            .result-button {
+                padding: 10px 25px;
+                font-size: 16px;
+                min-width: 150px;
+            }
+            
+            #close-result-button {
+                padding: 10px 30px;
+                font-size: 18px;
+                bottom: 20px;
+            }
+            
+            #fairy {
+                width: 100px !important;
+            }
+            
+            .tiny-ball {
+                width: 80px !important;
+                height: 80px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #new-year-ball {
+                width: 180px !important;
+            }
+            
+            .ball-text {
+                font-size: 14px !important;
+                padding: 5px 3px !important;
+            }
+            
+            .letter-option {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 16px !important;
+            }
+            
+            #snegurka-glow {
+                left: -20px !important;
+                width: 160px !important;
+                height: 160px !important;
+            }
+            
+            #snegurka-button {
+                left: 10px !important;
+                width: 120px !important; /* Адаптировано */
+                bottom: 20px !important;
+            }
+            
+            .instruction-button {
+                width: 40px;
+                height: 40px;
+            }
+            
+            #close-instruction {
+                transform: translateX(-15px);
+            }
+            
+            #music-toggle {
+                transform: translateX(15px);
+            }
+            
+            #close-instruction::before {
+                font-size: 32px;
+            }
+            
+            #close-instruction::after {
+                font-size: 14px;
+            }
+            
+            #music-toggle::before {
+                font-size: 28px;
+            }
+            
+            .instruction-buttons {
+                top: 350px;
+                gap: 15px;
+            }
+            
+            #counter {
+                padding: 10px 15px;
+                font-size: 16px;
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .counter-value {
+                font-size: 20px;
+            }
+            
+            #check-button {
+                padding: 10px 25px;
+                font-size: 18px;
+                bottom: 15px;
+            }
+            
+            #result-message h1 {
+                font-size: 30px;
+            }
+            
+            #result-message h2 {
+                font-size: 26px;
+            }
+            
+            #result-message p {
+                font-size: 22px;
+            }
+            
+            .result-button {
+                padding: 8px 20px;
+                font-size: 14px;
+                min-width: 130px;
+            }
+            
+            #close-result-button {
+                padding: 8px 25px;
+                font-size: 16px;
+                bottom: 15px;
+            }
+            
+            .result-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            #fairy {
+                width: 80px !important;
+            }
+            
+            .tiny-ball {
+                width: 70px !important;
+                height: 70px !important;
+            }
+        }
+
+        @media (max-height: 600px) {
+            #new-year-ball {
+                width: 160px !important;
+            }
+            
+            .ball-text {
+                font-size: 13px !important;
+                padding: 4px 2px !important;
+            }
+            
+            .letter-option {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 14px !important;
+            }
+            
+            #snegurka-glow {
+                width: 150px !important;
+                height: 150px !important;
+            }
+            
+            #snegurka-button {
+                width: 110px !important;
+                bottom: 15px !important;
+            }
+            
+            .instruction-buttons {
+                top: 320px;
+            }
+            
+            #counter {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .counter-value {
+                font-size: 18px;
+            }
+            
+            #result-message h1 {
+                font-size: 26px;
+            }
+            
+            #result-message h2 {
+                font-size: 22px;
+            }
+            
+            #result-message p {
+                font-size: 20px;
+            }
+            
+            #fairy {
+                width: 70px !important;
+            }
+            
+            .tiny-ball {
+                width: 65px !important;
+                height: 65px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="video-background" autoplay muted loop playsinline>
+            <source src="video/2v.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Fallback для видео -->
+    <div id="video-fallback"></div>
+
+    <!-- ИНСТРУКЦИЯ -->
+    <div id="instruction-overlay">
+        <div id="instruction-content">
+            <img src="images/I1.png" alt="Инструкция" id="instruction-image">
+        </div>
+        <!-- КНОПКИ ИНСТРУКЦИИ -->
+        <div class="instruction-buttons">
+            <button id="close-instruction" class="instruction-button"></button>
+            <button id="music-toggle" class="instruction-button"></button>
+        </div>
+    </div>
+
+    <!-- АУДИО ЭЛЕМЕНТЫ -->
+    <audio id="break-sound" preload="auto">
+        <source src="Zvuki/Udar.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- МУЗЫКА ДЛЯ ИНСТРУКЦИИ -->
+    <audio id="instruction-music" preload="auto" loop>
+        <source src="Zvuki/Zv_Vol.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="correct-sound-1" preload="auto">
+        <source src="Zvuki/Radost.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="correct-sound-2" preload="auto">
+        <source src="Zvuki/Radost1.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="correct-sound-3" preload="auto">
+        <source src="Zvuki/Radost2.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="correct-sound-4" preload="auto">
+        <source src="Zvuki/Radost3.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="correct-sound-5" preload="auto">
+        <source src="Zvuki/Radost4.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="correct-sound-6" preload="auto">
+        <source src="Zvuki/Radost5.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="correct-sound-7" preload="auto">
+        <source src="Zvuki/Radost6.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="correct-sound-8" preload="auto">
+        <source src="Zvuki/Radost7.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ЗВУК ФЕИ -->
+    <audio id="fairy-sound" preload="auto">
+        <source src="Zvuki/fairy.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- СЧЕТЧИК -->
+    <div id="counter">
+        <div class="counter-item">
+            <span>Правильные ответы:</span>
+            <span class="counter-value" id="correct-counter">0</span>/20
+        </div>
+        <div class="counter-item">
+            <span>Осталось заданий:</span>
+            <span class="counter-value" id="tasks-left">20</span>/20
+        </div>
+    </div>
+
+    <!-- КНОПКА ПРОВЕРИТЬ -->
+    <button id="check-button">ПРОВЕРИТЬ!</button>
+
+    <!-- КНОПКА ЗАКРЫТЬ для оценок 4 и 5 -->
+    <button id="close-result-button">Закрыть</button>
+
+    <!-- ФЕЯ -->
+    <div id="fairy-container">
+        <img src="images/Fea.gif" alt="Фея" id="fairy">
+    </div>
+
+    <img src="Shar/S3.png" alt="Новогодний шарик" class="side-ball left">
+    <img src="Shar/G2.png" alt="Новогодний шарик" class="side-ball right">
+
+    <img src="images/korobka.png" alt="Коробка с игрушками" id="korobka">
+
+    <div id="ball-container">
+        <img src="" alt="Новогодний шарик" id="new-year-ball">
+        <div class="ball-text" id="ball-text"></div>
+        <div class="letter-options" id="letter-options" style="display: none;"></div>
+    </div>
+
+    <!-- СНЕГУРОЧКА С СИЯНИЕМ -->
+    <div id="snegurka-button">
+        <img src="images/Snegurka.png" alt="Снегурка">
+    </div>
+    <div id="snegurka-glow"></div>
+
+    <!-- ОБНОВЛЕННАЯ ТАБЛИЧКА С РЕЗУЛЬТАТАМИ -->
+    <div id="result-message">
+        <h1 id="result-title">🎉 Результаты 🎉</h1>
+        <p id="result-text">Вы набрали <span id="result-score">0</span> баллов из 20</p>
+        <h2 id="result-grade">Оценка: <span id="grade-value">2</span></h2>
+        <div class="result-buttons" id="result-buttons">
+            <button id="close-result" class="result-button">Закрыть</button>
+            <button id="restart-button" class="result-button">Начать сначала</button>
+        </div>
+    </div>
+
+    <script>
+        const BALL_TOP_POSITION = '40px';
+
+        function adaptBallToScreen() {
+            const ball = document.getElementById('new-year-ball');
+            const ballText = document.getElementById('ball-text');
+            const letterOptions = document.getElementById('letter-options');
+            
+            if (!ball || ball.offsetWidth === 0) return;
+            
+            const ballWidth = ball.offsetWidth;
+            
+            if (ballText) {
+                const textWidth = ballWidth * 0.85;
+                ballText.style.width = textWidth + 'px';
+                ballText.style.fontSize = Math.max(14, Math.min(ballWidth * 0.08, 22)) + 'px';
+            }
+            
+            if (letterOptions) {
+                letterOptions.style.width = (ballWidth * 0.9) + 'px';
+                
+                const buttonSize = Math.max(28, ballWidth * 0.18);
+                const buttons = letterOptions.querySelectorAll('.letter-option');
+                buttons.forEach(btn => {
+                    btn.style.width = buttonSize + 'px';
+                    btn.style.height = buttonSize + 'px';
+                    btn.style.fontSize = Math.max(16, buttonSize * 0.5) + 'px';
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tasks = [
+                { word: "СНАР...ЖЕНИЕ", hint: "", options: ["Я", "И", "Е"], correct: "Я", image: "g.png" },
+                { word: "СТ...РОЖИЛ", hint: "(села)", options: ["А", "О"], correct: "А", image: "G1.png" },
+                { word: "ВЫТ...ЧКА", hint: "(на юбке)", options: ["О", "А"], correct: "А", image: "G2.png" },
+                { word: "УКР...ЩЕНИЕ", hint: "(тигров)", options: ["О", "А"], correct: "О", image: "k1.png" },
+                { word: "ПОЛ...РОВАТЬ", hint: "(мебель)", options: ["И", "Е"], correct: "И", image: "k2.png" },
+                { word: "УВ...ДАТЬ", hint: "(без влаги)", options: ["Я", "Е", "И"], correct: "Я", image: "k3.png" },
+                { word: "ПРОСВ...ЩЕНИЕ", hint: "(людей)", options: ["Е", "Я", "И"], correct: "Е", image: "k4.png" },
+                { word: "НАСЛ...ЖДЕНИЕ", hint: "(чтением)", options: ["А", "О"], correct: "А", image: "L1.png" },
+                { word: "ПОДР...ЖАТЬ", hint: "(герою)", options: ["А", "О"], correct: "А", image: "L2.png" },
+                { word: "ОСН...ЩЕНИЕ", hint: "", options: ["О", "А"], correct: "А", image: "L3.png" },
+                { word: "ПРИС...ГАТЬ", hint: "(Родине)", options: ["Е", "И", "Я"], correct: "Я", image: "S1.png" },
+                { word: "ПОЛ...СКАТЬ", hint: "(котёнка)", options: ["О", "А"], correct: "А", image: "S2.png" },
+                { word: "ПОГЛ...ЩАТЬ", hint: "(пищу)", options: ["А", "О"], correct: "О", image: "Si3.png" },
+                { word: "К...САТКА", hint: "(дельфин)", options: ["А", "О"], correct: "О", image: "S3.png" },
+                { word: "МОТ...ВАЦИЯ", hint: "", options: ["Е", "И"], correct: "И", image: "Si1.png" },
+                { word: "РАЗР...ДИТЬ", hint: "(посевы)", options: ["Е", "Я", "И"], correct: "Е", image: "Z1.png" },
+                { word: "ПРИСТ...ЖНОЙ", hint: "(воротник)", options: ["Е", "Я", "И"], correct: "Е", image: "Z2.png" },
+                { word: "НАК...ЛИТЬ", hint: "(железо)", options: ["О", "А"], correct: "А", image: "Z3.png" },
+                { word: "Т...СНЁННЫЙ", hint: "золотом", options: ["И", "Е", "Я"], correct: "И", image: "k5.png" },
+                { word: "ОБР...МЛЕНИЕ", hint: "", options: ["А", "О"], correct: "А", image: "k-g1.png" }
+            ];
+            
+            let availableTasks = [...tasks];
+            let correctAnswers = 0;
+            let ballCanHang = false;
+            let ballPlaced = false;
+            let taskActive = false;
+            let currentTinyBall = null;
+            let isDragging = false;
+            let dragOffsetX = 0;
+            let dragOffsetY = 0;
+            let instructionShown = false;
+            let currentSoundIndex = 0;
+            let musicPlaying = false;
+            let fairyAnimationInProgress = false;
+            let snegurkaParticles = [];
+            
+            const korobka = document.getElementById('korobka');
+            const ballContainer = document.getElementById('ball-container');
+            const ballText = document.getElementById('ball-text');
+            const letterOptions = document.getElementById('letter-options');
+            const newYearBall = document.getElementById('new-year-ball');
+            const breakSound = document.getElementById('break-sound');
+            const instructionMusic = document.getElementById('instruction-music');
+            const correctSound1 = document.getElementById('correct-sound-1');
+            const correctSound2 = document.getElementById('correct-sound-2');
+            const correctSound3 = document.getElementById('correct-sound-3');
+            const correctSound4 = document.getElementById('correct-sound-4');
+            const correctSound5 = document.getElementById('correct-sound-5');
+            const correctSound6 = document.getElementById('correct-sound-6');
+            const correctSound7 = document.getElementById('correct-sound-7');
+            const correctSound8 = document.getElementById('correct-sound-8');
+            const fairySound = document.getElementById('fairy-sound');
+            const correctCounter = document.getElementById('correct-counter');
+            const tasksLeft = document.getElementById('tasks-left');
+            const snegurkaButton = document.getElementById('snegurka-button');
+            const snegurkaGlow = document.getElementById('snegurka-glow');
+            const instructionOverlay = document.getElementById('instruction-overlay');
+            const closeInstruction = document.getElementById('close-instruction');
+            const musicToggle = document.getElementById('music-toggle');
+            const instructionImage = document.getElementById('instruction-image');
+            const checkButton = document.getElementById('check-button');
+            const closeResultButton = document.getElementById('close-result-button');
+            const resultMessage = document.getElementById('result-message');
+            const resultScore = document.getElementById('result-score');
+            const resultGrade = document.getElementById('grade-value');
+            const closeResult = document.getElementById('close-result');
+            const restartButton = document.getElementById('restart-button');
+            const videoBackground = document.getElementById('video-background');
+            const videoFallback = document.getElementById('video-fallback');
+            const resultTitle = document.getElementById('result-title');
+            const resultText = document.getElementById('result-text');
+            const resultButtons = document.getElementById('result-buttons');
+            const sideBallLeft = document.querySelector('.side-ball.left');
+            const sideBallRight = document.querySelector('.side-ball.right');
+            const fairyContainer = document.getElementById('fairy-container');
+            const fairy = document.getElementById('fairy');
+            
+            // Хранилище для ПОСТОЯННЫХ частиц вокруг шариков
+            const permanentDustClouds = new Map();
+            
+            // ФИКС 2: Обработка ошибок видео
+            videoBackground.addEventListener('error', function() {
+                console.log('Ошибка загрузки видео. Используем fallback фон.');
+                videoBackground.style.display = 'none';
+                videoFallback.style.display = 'block';
+            });
+            
+            videoBackground.addEventListener('loadeddata', function() {
+                videoFallback.style.display = 'none';
+            });
+            
+            function handleVideoError() {
+                console.log('Ошибка загрузки видео результатов.');
+                videoBackground.style.display = 'none';
+                videoFallback.style.display = 'block';
+            }
+            
+            // Функция для управления музыкой инструкции
+            function toggleInstructionMusic() {
+                if (musicPlaying) {
+                    instructionMusic.pause();
+                    instructionMusic.currentTime = 0;
+                    musicToggle.classList.add('muted');
+                    musicPlaying = false;
+                } else {
+                    instructionMusic.currentTime = 0;
+                    instructionMusic.play().then(() => {
+                        musicToggle.classList.remove('muted');
+                        musicPlaying = true;
+                    }).catch(e => {
+                        console.log('Не удалось воспроизвести музыку инструкции:', e);
+                        musicToggle.classList.add('muted');
+                        musicPlaying = false;
+                    });
+                }
+            }
+            
+            // Функция для воспроизведения случайного звука правильного ответа
+            function playNextCorrectSound() {
+                stopAllCorrectSounds();
+                
+                const sounds = [
+                    correctSound1, correctSound2, correctSound3, correctSound4,
+                    correctSound5, correctSound6, correctSound7, correctSound8
+                ];
+                
+                const selectedSound = sounds[currentSoundIndex];
+                selectedSound.currentTime = 0;
+                selectedSound.play().catch(e => console.log('Звук правильного ответа не воспроизвелся'));
+                
+                currentSoundIndex = (currentSoundIndex + 1) % sounds.length;
+                return selectedSound;
+            }
+            
+            // Функция для остановки всех звуков правильного ответа
+            function stopAllCorrectSounds() {
+                correctSound1.pause();
+                correctSound1.currentTime = 0;
+                correctSound2.pause();
+                correctSound2.currentTime = 0;
+                correctSound3.pause();
+                correctSound3.currentTime = 0;
+                correctSound4.pause();
+                correctSound4.currentTime = 0;
+                correctSound5.pause();
+                correctSound5.currentTime = 0;
+                correctSound6.pause();
+                correctSound6.currentTime = 0;
+                correctSound7.pause();
+                correctSound7.currentTime = 0;
+                correctSound8.pause();
+                correctSound8.currentTime = 0;
+            }
+            
+            // Функция для создания МАССИВНОГО ОБЛАКА ЗОЛОТОЙ ПЫЛИ
+            function createMassiveDustCloud(centerX, centerY) {
+                const particles = [];
+                const TOTAL_PARTICLES = 150;
+                
+                // Быстрые орбитальные частицы
+                for (let orbit = 1; orbit <= 5; orbit++) {
+                    const orbitRadius = 30 + orbit * 8;
+                    const particlesInOrbit = 12;
+                    
+                    for (let i = 0; i < particlesInOrbit; i++) {
+                        const angle = (i / particlesInOrbit) * Math.PI * 2;
+                        
+                        const dustParticle = document.createElement('div');
+                        dustParticle.className = 'gold-dust-particle';
+                        
+                        const posX = centerX + Math.cos(angle) * orbitRadius;
+                        const posY = centerY + Math.sin(angle) * orbitRadius;
+                        dustParticle.style.left = posX + 'px';
+                        dustParticle.style.top = posY + 'px';
+                        
+                        const size = 1.5 + Math.random() * 3;
+                        dustParticle.style.width = size + 'px';
+                        dustParticle.style.height = size + 'px';
+                        
+                        const hue = 40 + Math.random() * 20;
+                        const saturation = 60 + Math.random() * 40;
+                        const lightness = 40 + Math.random() * 40;
+                        dustParticle.style.background = `radial-gradient(circle, 
+                            hsla(${hue}, ${saturation}%, ${lightness}%, 0.7) 0%,
+                            hsla(${hue}, ${saturation}%, ${lightness}%, 0.3) 40%,
+                            transparent 70%)`;
+                        
+                        const orbitDuration = 2 + Math.random() * 2;
+                        const orbitAnimation = `dustOrbitFast${orbit} ${orbitDuration}s linear infinite`;
+                        
+                        const twinkleType = Math.random() > 0.5 ? 'dustTwinkleFast' : 'dustTwinkleSlow';
+                        const twinkleDuration = 1 + Math.random() * 2;
+                        const twinkleAnimation = `${twinkleType} ${twinkleDuration}s ease-in-out infinite`;
+                        
+                        dustParticle.style.animation = `${orbitAnimation}, ${twinkleAnimation}`;
+                        
+                        document.body.appendChild(dustParticle);
+                        particles.push(dustParticle);
+                    }
+                }
+                
+                // Хаотичные частицы
+                for (let i = 0; i < 80; i++) {
+                    setTimeout(() => {
+                        const dustParticle = document.createElement('div');
+                        dustParticle.className = 'gold-dust-particle';
+                        
+                        const startAngle = Math.random() * Math.PI * 2;
+                        const startRadius = 20 + Math.random() * 50;
+                        const posX = centerX + Math.cos(startAngle) * startRadius;
+                        const posY = centerY + Math.sin(startAngle) * startRadius;
+                        dustParticle.style.left = posX + 'px';
+                        dustParticle.style.top = posY + 'px';
+                        
+                        const size = 0.3 + Math.random() * 1.5;
+                        dustParticle.style.width = size + 'px';
+                        dustParticle.style.height = size + 'px';
+                        
+                        const hue = 45 + Math.random() * 15;
+                        const saturation = 70 + Math.random() * 30;
+                        dustParticle.style.background = `radial-gradient(circle, 
+                            hsla(${hue}, ${saturation}%, 70%, 0.8) 0%,
+                            hsla(${hue}, ${saturation}%, 60%, 0.4) 50%,
+                            transparent 80%)`;
+                        
+                        const swarmType = `dustSwarm${Math.floor(Math.random() * 3) + 1}`;
+                        const swarmDuration = 3 + Math.random() * 2;
+                        dustParticle.style.animation = `${swarmType} ${swarmDuration}s ease-out forwards`;
+                        
+                        document.body.appendChild(dustParticle);
+                        particles.push(dustParticle);
+                        
+                        setTimeout(() => {
+                            dustParticle.style.opacity = '0';
+                            dustParticle.style.transition = 'opacity 0.5s ease';
+                            setTimeout(() => {
+                                if (dustParticle.parentNode) dustParticle.remove();
+                                const index = particles.indexOf(dustParticle);
+                                if (index > -1) particles.splice(index, 1);
+                            }, 500);
+                        }, swarmDuration * 1000);
+                    }, i * 40);
+                }
+                
+                // Звёздочки
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => {
+                        const starParticle = document.createElement('div');
+                        starParticle.className = 'star-particle';
+                        starParticle.innerHTML = Math.random() > 0.5 ? '★' : '✶';
+                        
+                        const startAngle = Math.random() * Math.PI * 2;
+                        const startRadius = 25 + Math.random() * 40;
+                        const posX = centerX + Math.cos(startAngle) * startRadius;
+                        const posY = centerY + Math.sin(startAngle) * startRadius;
+                        starParticle.style.left = posX + 'px';
+                        starParticle.style.top = posY + 'px';
+                        
+                        const fontSize = 2 + Math.random() * 3;
+                        starParticle.style.fontSize = fontSize + 'px';
+                        
+                        const starColors = ['#FFD700', '#FFEC8B', '#FFF8DC', '#FFE4B5', '#FFDEAD'];
+                        starParticle.style.color = starColors[Math.floor(Math.random() * starColors.length)];
+                        
+                        const orbitType = Math.floor(Math.random() * 5) + 1;
+                        const orbitDuration = 4 + Math.random() * 2;
+                        starParticle.style.animation = `dustOrbitFast${orbitType} ${orbitDuration}s linear infinite, dustTwinkleFast 1.5s ease-in-out infinite`;
+                        
+                        document.body.appendChild(starParticle);
+                        particles.push(starParticle);
+                    }, i * 60);
+                }
+                
+                return {
+                    particles,
+                    stopAdding: () => {}
+                };
+            }
+            
+            // Функция для создания ПОСТОЯННОГО облака частиц вокруг шарика
+            function createPermanentDustCloud(centerX, centerY, ballId) {
+                // Удаляем старые частицы для этого шарика, если они есть
+                if (permanentDustClouds.has(ballId)) {
+                    const oldCloud = permanentDustClouds.get(ballId);
+                    oldCloud.particles.forEach(particle => {
+                        if (particle && particle.parentNode) {
+                            particle.remove();
+                        }
+                    });
+                    permanentDustClouds.delete(ballId);
+                }
+                
+                const particles = [];
+                
+                // 1. Быстрые орбитальные частицы
+                for (let orbit = 1; orbit <= 3; orbit++) {
+                    const orbitRadius = 25 + orbit * 6;
+                    const particlesInOrbit = 8;
+                    
+                    for (let i = 0; i < particlesInOrbit; i++) {
+                        const angle = (i / particlesInOrbit) * Math.PI * 2;
+                        
+                        const dustParticle = document.createElement('div');
+                        dustParticle.className = 'gold-dust-particle';
+                        
+                        const posX = centerX + Math.cos(angle) * orbitRadius;
+                        const posY = centerY + Math.sin(angle) * orbitRadius;
+                        dustParticle.style.left = posX + 'px';
+                        dustParticle.style.top = posY + 'px';
+                        
+                        const size = 1 + Math.random() * 2;
+                        dustParticle.style.width = size + 'px';
+                        dustParticle.style.height = size + 'px';
+                        
+                        const hue = 40 + Math.random() * 20;
+                        const saturation = 60 + Math.random() * 40;
+                        dustParticle.style.background = `radial-gradient(circle, 
+                            hsla(${hue}, ${saturation}%, 70%, 0.7) 0%,
+                            hsla(${hue}, ${saturation}%, 60%, 0.4) 50%,
+                            transparent 80%)`;
+                        
+                        const orbitDuration = 8 + Math.random() * 6;
+                        const orbitAnimation = `dustOrbitFast${orbit} ${orbitDuration}s linear infinite`;
+                        const twinkleDuration = 2 + Math.random() * 2;
+                        dustParticle.style.animation = `${orbitAnimation}, dustTwinkleFast ${twinkleDuration}s ease-in-out infinite`;
+                        
+                        dustParticle.style.opacity = '0.6';
+                        dustParticle.style.pointerEvents = 'none';
+                        dustParticle.style.zIndex = '88';
+                        
+                        document.body.appendChild(dustParticle);
+                        particles.push(dustParticle);
+                    }
+                }
+                
+                // 2. Звёздочки
+                for (let i = 0; i < 15; i++) {
+                    const starParticle = document.createElement('div');
+                    starParticle.className = 'star-particle';
+                    starParticle.innerHTML = Math.random() > 0.5 ? '★' : '✶';
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 15 + Math.random() * 30;
+                    const posX = centerX + Math.cos(angle) * radius;
+                    const posY = centerY + Math.sin(angle) * radius;
+                    starParticle.style.left = posX + 'px';
+                    starParticle.style.top = posY + 'px';
+                    
+                    const fontSize = 2 + Math.random() * 3;
+                    starParticle.style.fontSize = fontSize + 'px';
+                    
+                    const starColors = ['#FFD700', '#FFEC8B', '#FFF8DC', '#FFE4B5'];
+                    starParticle.style.color = starColors[Math.floor(Math.random() * starColors.length)];
+                    
+                    starParticle.style.textShadow = 
+                        `0 0 ${fontSize * 0.5}px ${starParticle.style.color},
+                         0 0 ${fontSize * 1}px rgba(255, 215, 0, 0.5)`;
+                    
+                    const orbitType = Math.floor(Math.random() * 3) + 1;
+                    const orbitDuration = 12 + Math.random() * 8;
+                    starParticle.style.animation = 
+                        `dustOrbitFast${orbitType} ${orbitDuration}s linear infinite, 
+                         dustTwinkleFast ${1.5 + Math.random() * 1}s ease-in-out infinite`;
+                    
+                    starParticle.style.opacity = '0.7';
+                    starParticle.style.pointerEvents = 'none';
+                    starParticle.style.zIndex = '88';
+                    
+                    document.body.appendChild(starParticle);
+                    particles.push(starParticle);
+                }
+                
+                const dustCloud = {
+                    particles,
+                    updatePosition: function(newX, newY) {
+                        // Обновление позиций не требуется
+                    }
+                };
+                
+                permanentDustClouds.set(ballId, dustCloud);
+                return dustCloud;
+            }
+            
+            // Функция для создания частиц вокруг Снегурки
+            function createSnegurkaParticles() {
+                // Очищаем старые частицы
+                snegurkaParticles.forEach(particle => {
+                    if (particle && particle.parentNode) {
+                        particle.remove();
+                    }
+                });
+                snegurkaParticles = [];
+                
+                const PARTICLE_COUNT = 30;
+                
+                for (let i = 0; i < PARTICLE_COUNT; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'snegurka-particle';
+                        
+                        // Начальная позиция - случайно вокруг Снегурки
+                        const angle = Math.random() * Math.PI * 2;
+                        const radius = 60 + Math.random() * 100;
+                        const snegurkaRect = snegurkaButton.getBoundingClientRect();
+                        const centerX = snegurkaRect.left + snegurkaRect.width / 2;
+                        const centerY = snegurkaRect.top + snegurkaRect.height / 2;
+                        
+                        particle.style.left = (centerX + Math.cos(angle) * radius) + 'px';
+                        particle.style.top = (centerY + Math.sin(angle) * radius) + 'px';
+                        
+                        // Разные размеры и цвета частиц
+                        const size = 4 + Math.random() * 8;
+                        particle.style.width = size + 'px';
+                        particle.style.height = size + 'px';
+                        
+                        const hue = 40 + Math.random() * 20; // золотистые оттенки
+                        const saturation = 60 + Math.random() * 40;
+                        particle.style.background = `radial-gradient(circle, 
+                            hsla(${hue}, ${saturation}%, 70%, 0.8) 0%,
+                            hsla(${hue}, ${saturation}%, 60%, 0.4) 70%,
+                            transparent 100%)`;
+                        
+                        // Каждая частица имеет свою задержку анимации
+                        particle.style.animationDelay = (Math.random() * 3) + 's';
+                        
+                        document.body.appendChild(particle);
+                        snegurkaParticles.push(particle);
+                    }, i * 100);
+                }
+            }
+            
+            // Обновление позиций частиц Снегурки при ресайзе
+            function updateSnegurkaParticles() {
+                if (snegurkaParticles.length === 0) return;
+                
+                const snegurkaRect = snegurkaButton.getBoundingClientRect();
+                const centerX = snegurkaRect.left + snegurkaRect.width / 2;
+                const centerY = snegurkaRect.top + snegurkaRect.height / 2;
+                
+                // Обновляем свечение
+                if (snegurkaGlow) {
+                    snegurkaGlow.style.left = (centerX - 140) + 'px';
+                    snegurkaGlow.style.top = (centerY - 140) + 'px';
+                }
+                
+                // Обновляем частицы
+                snegurkaParticles.forEach((particle, index) => {
+                    if (!particle || !particle.parentNode) return;
+                    
+                    const angle = (index / snegurkaParticles.length) * Math.PI * 2;
+                    const radius = 60 + (index % 5) * 20;
+                    
+                    particle.style.left = (centerX + Math.cos(angle) * radius) + 'px';
+                    particle.style.top = (centerY + Math.sin(angle) * radius) + 'px';
+                });
+            }
+            
+            // Функция для показа анимации феи (БЕЗ СВЕРХСВЕЧЕНИЯ!)
+            function showFairyAnimation(ballX, ballY) {
+                if (fairyAnimationInProgress) return;
+                
+                fairyAnimationInProgress = true;
+                
+                // Воспроизводим звук феи
+                if (fairySound) {
+                    fairySound.currentTime = 0;
+                    fairySound.play().catch(e => console.log('Звук феи не воспроизвелся'));
+                }
+                
+                // Создаем облако золотой пыли
+                const dustCloud = createMassiveDustCloud(ballX, ballY);
+                
+                // Показываем фею
+                fairyContainer.style.display = 'block';
+                fairyContainer.style.opacity = '1';
+                
+                // Начальная позиция - слева от шарика
+                fairyContainer.style.left = (ballX - 180) + 'px';
+                fairyContainer.style.top = (ballY - 120) + 'px';
+                fairyContainer.style.transition = 'none';
+                fairy.style.animation = 'fairyFloat 3s ease-in-out infinite';
+                
+                // Ждем немного для плавности
+                setTimeout(() => {
+                    // Подлетаем к шарику
+                    fairyContainer.style.transition = 'all 1.2s ease-in-out';
+                    fairyContainer.style.left = (ballX - 77) + 'px';
+                    fairyContainer.style.top = (ballY - 70) + 'px';
+                    
+                    // Ждем пока фея подлетит к шарику
+                    setTimeout(() => {
+                        // ТОЛЬКО анимация волшебной палочки феи
+                        fairy.style.animation = 'wandGlow 0.5s ease-in-out 3';
+                        
+                        // НЕТ усиленного свечения шарика!
+                        
+                        // Фея улетает
+                        setTimeout(() => {
+                            fairyContainer.style.transition = 'all 1.5s ease-in-out';
+                            fairyContainer.style.left = (ballX + 200) + 'px';
+                            fairyContainer.style.top = (ballY - 150) + 'px';
+                            fairyContainer.style.opacity = '0';
+                            
+                            // Плавно удаляем все ВРЕМЕННЫЕ частицы
+                            setTimeout(() => {
+                                dustCloud.particles.forEach(particle => {
+                                    if (particle && particle.parentNode) {
+                                        particle.style.opacity = '0';
+                                        particle.style.transition = 'opacity 0.5s ease';
+                                        setTimeout(() => {
+                                            if (particle.parentNode) particle.remove();
+                                        }, 500);
+                                    }
+                                });
+                            }, 1000);
+                            
+                            // Скрываем фею
+                            setTimeout(() => {
+                                fairyContainer.style.display = 'none';
+                                fairyContainer.style.opacity = '1';
+                                fairyContainer.style.transition = '';
+                                fairy.style.animation = 'fairyFloat 3s ease-in-out infinite';
+                                fairyAnimationInProgress = false;
+                            }, 1500);
+                            
+                        }, 2000);
+                        
+                    }, 1200);
+                    
+                }, 300);
+            }
+            
+            // Показать инструкцию
+            function showInstruction() {
+                if (!instructionShown) {
+                    instructionOverlay.classList.add('active');
+                    instructionShown = true;
+                    
+                    if (!musicPlaying) {
+                        instructionMusic.currentTime = 0;
+                        instructionMusic.play().catch(e => {
+                            console.log('Не удалось воспроизвести музыку инструкции:', e);
+                            musicToggle.classList.add('muted');
+                        });
+                        musicToggle.classList.remove('muted');
+                        musicPlaying = true;
+                    }
+                    
+                    instructionImage.src = 'images/I1.png';
+                    
+                    setTimeout(() => {
+                        instructionImage.src = 'images/I2.png';
+                    }, 2000);
+                    
+                    setTimeout(() => {
+                        instructionImage.src = 'images/I3.png';
+                    }, 5000);
+                }
+            }
+            
+            // Скрыть инструкцию
+            function hideInstruction() {
+                instructionOverlay.classList.remove('active');
+                
+                if (musicPlaying) {
+                    instructionMusic.pause();
+                    instructionMusic.currentTime = 0;
+                    musicPlaying = false;
+                }
+            }
+            
+            // Обработчик закрытия инструкции
+            closeInstruction.addEventListener('click', hideInstruction);
+            
+            // Обработчик переключения музыки
+            musicToggle.addEventListener('click', toggleInstructionMusic);
+            
+            // Закрытие инструкции по клику на фон
+            instructionOverlay.addEventListener('click', function(e) {
+                if (e.target === instructionOverlay) {
+                    hideInstruction();
+                }
+            });
+            
+            // Функция для определения оценки
+            function calculateGrade(correct) {
+                if (correct >= 19) return { grade: '5', text: 'Отлично!' };
+                if (correct >= 15) return { grade: '4', text: 'Хорошо!' };
+                if (correct >= 9) return { grade: '3', text: 'Удовлетворительно' };
+                return { grade: '2', text: 'Попробуйте еще раз' };
+            }
+            
+            // Функция для показа результатов
+            function showResults() {
+                const gradeInfo = calculateGrade(correctAnswers);
+
+                if (gradeInfo.grade === '5') {
+                  window.parent.postMessage({ type: "boardSuccess" }, "*");
+            }
+                resultScore.textContent = correctAnswers;
+                resultGrade.textContent = gradeInfo.grade;
+                resultTitle.textContent = gradeInfo.text;
+                resultText.textContent = `Вы набрали ${correctAnswers} баллов из 20`;
+                
+                checkButton.style.display = 'none';
+                korobka.style.display = 'none';
+                sideBallLeft.style.display = 'none';
+                sideBallRight.style.display = 'none';
+                document.getElementById('counter').style.display = 'none';
+                
+                if (gradeInfo.grade === '5' || gradeInfo.grade === '4') {
+                    videoBackground.src = 'video/2v1.mp4';
+                    videoBackground.loop = false; 
+                    videoBackground.muted = false;
+                    videoBackground.load();
+                    videoBackground.play().catch(handleVideoError);
+                    
+                    // после окончания видео
+                    videoBackground.onended = function () {
+
+                   // остановить видео
+                   videoBackground.pause();
+
+                   // закрыть окно игры
+                   window.close();
+              };
+                    
+                    closeResultButton.style.display = 'block';
+                    resultButtons.style.display = 'none';
+                } else {
+                    videoBackground.muted = true;
+                    closeResultButton.style.display = 'none';
+                    resultButtons.style.display = 'flex';
+                }
+                
+                resultMessage.style.display = 'block';
+            }
+            
+            // Функция для перезапуска игры
+            function restartGame() {
+                availableTasks = [...tasks];
+                correctAnswers = 0;
+                ballCanHang = false;
+                ballPlaced = false;
+                taskActive = false;
+                fairyAnimationInProgress = false;
+                
+                // Удаляем все шарики
+                document.querySelectorAll('.tree-ball').forEach(ball => ball.remove());
+                
+                // Удаляем все частицы
+                document.querySelectorAll('.gold-dust-particle, .star-particle, .snegurka-particle').forEach(el => {
+                    if (el.parentNode) el.remove();
+                });
+                
+                // Удаляем все осколки
+                document.querySelectorAll('.shard').forEach(el => {
+                    if (el.parentNode) el.remove();
+                });
+                
+                // Очищаем хранилище частиц
+                permanentDustClouds.forEach((dustCloud, ballId) => {
+                    dustCloud.particles.forEach(particle => {
+                        if (particle && particle.parentNode) {
+                            particle.remove();
+                        }
+                    });
+                });
+                permanentDustClouds.clear();
+                snegurkaParticles = [];
+                
+                if (fairyContainer) {
+                    fairyContainer.style.display = 'none';
+                }
+                
+                videoBackground.src = 'video/2v.mp4';
+                videoBackground.muted = true;
+                videoBackground.load();
+                videoBackground.play().catch(handleVideoError);
+                
+                korobka.style.display = 'block';
+                sideBallLeft.style.display = 'block';
+                sideBallRight.style.display = 'block';
+                document.getElementById('counter').style.display = 'flex';
+                
+                resultMessage.style.display = 'none';
+                closeResultButton.style.display = 'none';
+                
+                if (availableTasks.length === 0) {
+                    checkButton.style.display = 'block';
+                } else {
+                    checkButton.style.display = 'none';
+                }
+                
+                updateCounters();
+                
+                ballContainer.style.opacity = '0';
+                ballContainer.classList.remove('with-task');
+                letterOptions.style.display = 'none';
+                
+                korobka.classList.add('visible');
+                
+                // Пересоздаем частицы Снегурки
+                setTimeout(() => {
+                    createSnegurkaParticles();
+                }, 500);
+            }
+            
+            // Обработчики для кнопок
+            closeResult.addEventListener('click', function() {
+                resultMessage.style.display = 'none';
+                closeResultButton.style.display = 'none';
+            });
+            
+            closeResultButton.addEventListener('click', function() {
+                resultMessage.style.display = 'none';
+                closeResultButton.style.display = 'none';
+            });
+            
+            restartButton.addEventListener('click', restartGame);
+            
+            // Обработчик для кнопки ПРОВЕРИТЬ
+            checkButton.addEventListener('click', showResults);
+            
+            function updateCounters() {
+                correctCounter.textContent = correctAnswers;
+                tasksLeft.textContent = availableTasks.length;
+                
+                if (availableTasks.length === 0) {
+                    checkButton.style.display = 'block';
+                } else {
+                    checkButton.style.display = 'none';
+                }
+            }
+            
+            function startSwayAnimation() {
+                let angle = 0;
+                let direction = 1;
+                const maxAngle = 5;
+                const speed = 0.05;
+                
+                function sway() {
+                    angle += speed * direction;
+                    
+                    if (angle > maxAngle || angle < -maxAngle) {
+                        direction *= -1;
+                    }
+                    
+                    snegurkaButton.style.transform = `rotate(${angle}deg)`;
+                    requestAnimationFrame(sway);
+                }
+                
+                sway();
+            }
+            
+            // ФИКС 4: Исправление утечек памяти в createShards
+            function createShards(x, y) {
+                const shardCount = 6;
+                const shardAnimations = [
+                    'shard1 1s ease-out forwards',
+                    'shard2 1s ease-out forwards',
+                    'shard3 1s ease-out forwards',
+                    'shard4 1s ease-out forwards',
+                    'shard5 1s ease-out forwards',
+                    'shard6 1s ease-out forwards'
+                ];
+                
+                const shardColors = [
+                    'linear-gradient(45deg, #ff6b6b, #ee5a52)',
+                    'linear-gradient(45deg, #ffd700, #ff8c00)',
+                    'linear-gradient(45deg, #2ecc71, #27ae60)',
+                    'linear-gradient(45deg, #3498db, #2980b9)',
+                    'linear-gradient(45deg, #9b59b6, #8e44ad)',
+                    'linear-gradient(45deg, #ff6b6b, #ff8c00)'
+                ];
+                
+                const shards = [];
+                const fragment = document.createDocumentFragment();
+                
+                for (let i = 0; i < shardCount; i++) {
+                    const shard = document.createElement('div');
+                    shard.className = 'shard';
+                    shard.style.left = x + 'px';
+                    shard.style.top = y + 'px';
+                    shard.style.background = shardColors[i];
+                    shard.style.animation = shardAnimations[i];
+                    shard.style.width = (15 + Math.random() * 15) + 'px';
+                    shard.style.height = (15 + Math.random() * 15) + 'px';
+                    shard.style.opacity = '0.9';
+                    
+                    fragment.appendChild(shard);
+                    shards.push(shard);
+                }
+                
+                document.body.appendChild(fragment);
+                
+                setTimeout(() => {
+                    shards.forEach(shard => {
+                        if (shard.parentNode) {
+                            shard.style.opacity = '0';
+                            shard.style.transition = 'opacity 0.5s ease';
+                            setTimeout(() => {
+                                if (shard.parentNode) shard.remove();
+                            }, 500);
+                        }
+                    });
+                }, 1500);
+            }
+            
+            function getRandomTask() {
+                if (availableTasks.length === 0) return null;
+                const randomIndex = Math.floor(Math.random() * availableTasks.length);
+                return availableTasks[randomIndex];
+            }
+            
+            function removeTask(task) {
+                const index = availableTasks.indexOf(task);
+                if (index > -1) {
+                    availableTasks.splice(index, 1);
+                }
+            }
+            
+            function showKorobka() {
+                setTimeout(() => {
+                    korobka.classList.add('visible');
+                    setTimeout(() => {
+                        showInstruction();
+                    }, 500);
+                }, 2000);
+            }
+            
+            function showSnegurka() {
+                setTimeout(() => {
+                    snegurkaButton.classList.add('visible');
+                    if (snegurkaGlow) {
+                        snegurkaGlow.style.opacity = '0.7';
+                    }
+                    startSwayAnimation();
+                    
+                    // Добавляем сияние через секунду
+                    setTimeout(() => {
+                        createSnegurkaParticles();
+                    }, 1000);
+                }, 1000);
+            }
+            
+            function setBallPosition() {
+                ballContainer.style.top = BALL_TOP_POSITION;
+            }
+            
+            function showNewTask() {
+                if (availableTasks.length === 0) {
+                    return;
+                }
+                
+                const task = getRandomTask();
+                if (!task) return;
+                
+                console.log('Новое задание:', task.word);
+                
+                ballContainer.className = '';
+                ballContainer.style.left = '50%';
+                setBallPosition();
+                ballContainer.style.transform = 'translateX(-50%)';
+                ballContainer.style.opacity = '0';
+                
+                newYearBall.src = 'Shar/' + task.image;
+                newYearBall.onerror = function() {
+                    this.src = 'Shar/S3.png';
+                };
+                
+                ballText.innerHTML = task.word.replace('...', '..') + 
+                    (task.hint ? '<br><span class="hint-text">' + task.hint + '</span>' : '');
+                
+                letterOptions.innerHTML = '';
+                task.options.forEach(letter => {
+                    const button = document.createElement('button');
+                    button.className = 'letter-option';
+                    button.setAttribute('data-letter', letter);
+                    button.textContent = letter;
+                    button.dataset.taskWord = task.word;
+                    letterOptions.appendChild(button);
+                });
+                
+                ballContainer.style.opacity = '1';
+                ballContainer.dataset.currentTask = task.word;
+                
+                setTimeout(() => {
+                    ballContainer.classList.add('rising');
+                    setTimeout(() => {
+                        adaptBallToScreen();
+                    }, 100);
+                }, 50);
+                
+                setTimeout(() => {
+                    ballContainer.classList.remove('rising');
+                    ballContainer.classList.add('with-task');
+                    letterOptions.style.display = 'flex';
+                    taskActive = true;
+                    
+                    setTimeout(adaptBallToScreen, 300);
+                }, 800);
+            }
+            
+            korobka.addEventListener('click', function() {
+                if (!taskActive && !ballPlaced) {
+                    showNewTask();
+                }
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('letter-option') && taskActive) {
+                    const selectedLetter = e.target.getAttribute('data-letter');
+                    const taskWord = e.target.dataset.taskWord;
+                    const task = tasks.find(t => t.word === taskWord);
+                    
+                    if (!task) return;
+                    
+                    const letterButtons = document.querySelectorAll('.letter-option');
+                    
+                    letterButtons.forEach(btn => btn.style.pointerEvents = 'none');
+                    
+                    letterButtons.forEach(btn => {
+                        if (btn.getAttribute('data-letter') === task.correct) {
+                            btn.classList.add('correct');
+                        } else {
+                            btn.classList.add('wrong');
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        if (selectedLetter === task.correct) {
+                            correctAnswers++;
+                            removeTask(task);
+                            
+                            ballText.innerHTML = task.word.replace('...', 
+                                '<span style="color: #2ecc71">' + task.correct + '</span>') + 
+                                (task.hint ? '<br><span class="hint-text">' + task.hint + '</span>' : '');
+                            
+                            playNextCorrectSound();
+                            
+                            setTimeout(() => {
+                                ballContainer.classList.remove('with-task');
+                                letterOptions.style.display = 'none';
+                                
+                                ballText.style.opacity = '0';
+                                ballText.style.transition = 'opacity 0.5s ease';
+                                
+                                setTimeout(() => {
+                                    ballContainer.style.position = 'fixed';
+                                    setBallPosition();
+                                    ballContainer.style.left = '50%';
+                                    ballContainer.style.transform = 'translateX(-50%) scale(1.5)';
+                                    ballContainer.style.opacity = '1';
+                                    ballContainer.style.zIndex = '30';
+                                    
+                                    ballContainer.classList.add('picking-from-box');
+                                    
+                                    setTimeout(() => {
+                                        ballContainer.style.opacity = '0';
+                                        ballContainer.classList.remove('picking-from-box');
+                                        
+                                        ballText.style.opacity = '1';
+                                        
+                                        createTinyBall('Shar/' + task.image);
+                                        
+                                        if (currentTinyBall) {
+                                            const korobkaRect = korobka.getBoundingClientRect();
+                                            currentTinyBall.style.left = (korobkaRect.left + korobkaRect.width / 2) + 'px';
+                                            currentTinyBall.style.top = (korobkaRect.top + korobkaRect.height / 2 - 20) + 'px';
+                                            currentTinyBall.style.transform = 'translate(-50%, -50%) scale(0.9)';
+                                            currentTinyBall.style.transition = 'transform 0.3s ease';
+                                            
+                                            korobka.style.filter = 'drop-shadow(0 0 25px rgba(255, 215, 0, 0.8)) brightness(1.1)';
+                                            setTimeout(() => {
+                                                korobka.style.filter = '';
+                                            }, 1000);
+                                        }
+                                        
+                                        taskActive = false;
+                                        updateCounters();
+                                        
+                                    }, 1000);
+                                    
+                                }, 300);
+                                
+                            }, 700);
+                            
+                        } else {
+                            ballText.innerHTML = task.word.replace('...', 
+                                '<span style="color: #e74c3c">' + selectedLetter + '</span>') + 
+                                (task.hint ? '<br><span class="hint-text">' + task.hint + '</span>' : '');
+                            
+                            removeTask(task);
+                            
+                            setTimeout(() => {
+                                letterOptions.style.display = 'none';
+                                ballContainer.classList.remove('with-task');
+                                
+                                ballText.style.opacity = '0';
+                                ballText.style.transition = 'opacity 0.5s ease';
+                                
+                                ballContainer.style.position = 'fixed';
+                                setBallPosition();
+                                ballContainer.style.left = '50%';
+                                ballContainer.style.transform = 'translateX(-50%) scale(1.5)';
+                                ballContainer.style.zIndex = '30';
+
+                                ballContainer.className = '';
+                                ballContainer.classList.add('shrink-fall-break');
+                                
+                                setTimeout(() => {
+                                    breakSound.currentTime = 0;
+                                    breakSound.play().catch(e => console.log('Звук не воспроизвелся'));
+                                    
+                                    const viewportWidth = window.innerWidth;
+                                    const viewportHeight = window.innerHeight;
+                                    createShards(viewportWidth / 2, viewportHeight - 100);
+                                }, 1800);
+                                
+                                setTimeout(() => {
+                                    ballContainer.style.opacity = '0';
+                                    ballContainer.classList.remove('shrink-fall-break');
+                                    ballText.style.opacity = '1';
+                                    taskActive = false;
+                                    updateCounters();
+                                }, 2200);
+                            }, 1000);
+                        }
+                    }, 1000);
+                }
+            });
+            
+            // ФИКС 1: Исправление JS ошибки с currentTinyBall
+            function createTinyBall(imageSrc) {
+                if (currentTinyBall) {
+                    currentTinyBall.remove();
+                }
+                
+                currentTinyBall = document.createElement('img');
+                currentTinyBall.className = 'tiny-ball';
+                currentTinyBall.src = imageSrc;
+                currentTinyBall.style.left = '50%';
+                currentTinyBall.style.top = '50%';
+                currentTinyBall.style.opacity = '1';
+                currentTinyBall.style.transform = 'translate(-50%, -50%)';
+                
+                document.body.appendChild(currentTinyBall);
+                
+                ballCanHang = true;
+                ballPlaced = false;
+                
+                setupDragListeners(currentTinyBall);
+            }
+            
+            function setupDragListeners(ball) {
+                ball.addEventListener('mousedown', startDrag);
+                ball.addEventListener('touchstart', startDragTouch, { passive: false });
+            }
+            
+            function startDrag(e) {
+                if (ballCanHang && !ballPlaced) {
+                    isDragging = true;
+                    
+                    // Центрируем захват
+                    const rect = currentTinyBall.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    const clientX = e.clientX || e.touches[0].clientX;
+                    const clientY = e.clientY || e.touches[0].clientY;
+                    
+                    dragOffsetX = clientX - centerX;
+                    dragOffsetY = clientY - centerY;
+                    
+                    currentTinyBall.style.cursor = 'grabbing';
+                    currentTinyBall.style.transition = 'none';
+                    e.preventDefault();
+                }
+            }
+            
+            function startDragTouch(e) {
+                startDrag(e);
+            }
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging && ballCanHang && !ballPlaced && currentTinyBall) {
+                    currentTinyBall.style.left = (e.clientX - dragOffsetX) + 'px';
+                    currentTinyBall.style.top = (e.clientY - dragOffsetY) + 'px';
+                    currentTinyBall.style.transform = 'none';
+                }
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                if (isDragging && ballCanHang && !ballPlaced && currentTinyBall) {
+                    const touch = e.touches[0];
+                    currentTinyBall.style.left = (touch.clientX - dragOffsetX) + 'px';
+                    currentTinyBall.style.top = (touch.clientY - dragOffsetY) + 'px';
+                    currentTinyBall.style.transform = 'none';
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            document.addEventListener('mouseup', function() {
+                if (isDragging && ballCanHang && !ballPlaced && currentTinyBall) {
+                    isDragging = false;
+                    currentTinyBall.style.cursor = 'grab';
+                    currentTinyBall.style.transition = 'all 0.3s ease';
+                    checkIfOnTree();
+                }
+            });
+            
+            document.addEventListener('touchend', function(e) {
+                if (isDragging && ballCanHang && !ballPlaced && currentTinyBall) {
+                    isDragging = false;
+                    currentTinyBall.style.transition = 'all 0.3s ease';
+                    checkIfOnTree();
+                    e.preventDefault();
+                }
+            });
+            
+            document.addEventListener('touchcancel', function(e) {
+                if (isDragging) {
+                    isDragging = false;
+                    if (currentTinyBall) {
+                        currentTinyBall.style.transition = 'all 0.3s ease';
+                    }
+                    e.preventDefault();
+                }
+            });
+            
+            function checkIfOnTree() {
+                const rect = currentTinyBall.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                ballPlaced = true;
+                ballCanHang = false;
+                
+                const treeBall = document.createElement('img');
+                treeBall.className = 'tree-ball';
+                treeBall.src = currentTinyBall.src;
+                treeBall.style.left = (centerX - 35) + 'px';
+                treeBall.style.top = (centerY - 35) + 'px';
+                
+                const ballId = 'ball_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                treeBall.dataset.ballId = ballId;
+                
+                document.body.appendChild(treeBall);
+                
+                // Создаем ПОСТОЯННОЕ облако частиц вокруг шарика
+                createPermanentDustCloud(centerX, centerY, ballId);
+                
+                // Показываем анимацию феи (без сверхсвечения)
+                showFairyAnimation(centerX, centerY);
+                
+                setTimeout(() => {
+                    if (currentTinyBall.parentNode) {
+                        currentTinyBall.remove();
+                    }
+                    currentTinyBall = null;
+                    ballPlaced = false;
+               }, 300);
+            }
+            
+            snegurkaButton.addEventListener('click', function() {
+                alert('Снегурка: продолжайте украшать ёлку!');
+            });
+            
+            // ИНИЦИАЛИЗАЦИЯ
+            showKorobka();
+            showSnegurka();
+            updateCounters();
+            
+            window.addEventListener('resize', function() {
+                adaptBallToScreen();
+                updateSnegurkaParticles();
+            });
+            
+            console.log('Игра загружена! Снегурка с сиянием готова!');
+            
+            setTimeout(() => {
+                if (instructionMusic.paused) {
+                    musicToggle.classList.add('muted');
+                    musicPlaying = false;
+                } else {
+                    musicToggle.classList.remove('muted');
+                    musicPlaying = true;
+                }
+            }, 200);
+        });
+    </script>
+</body>
